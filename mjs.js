@@ -31,6 +31,8 @@
  * Vector and Matrix math utilities for JavaScript, optimized for WebGL.
  */
 
+define([], function() {
+
 /*
  * Constant: MJS_VERSION
  *
@@ -1840,3 +1842,6 @@ var mjs = {
   V3: V3,
   M4x4: M4x4
 };
+
+return mjs;
+});
