@@ -53,7 +53,7 @@ const MJS_DO_ASSERT = true;
 
 // Some hacks for running in both the shell and browser,
 // and for supporting F32 and WebGLFloat arrays
-try { WebGLFloatArray; } catch (x) { WebGLFloatArray = Float32Array; }
+// try { WebGLFloatArray  undefined; } catch (x) { WebGLFloatArray = Float32Array; }
 
 /*
  * Constant: MJS_FLOAT_ARRAY_TYPE
@@ -65,8 +65,8 @@ try { WebGLFloatArray; } catch (x) { WebGLFloatArray = Float32Array; }
  * MJS_FLOAT_ARRAY_TYPE.  Also, the builtin constants such as (M4x4.I)
  * will be of this type.
  */
-const MJS_FLOAT_ARRAY_TYPE = WebGLFloatArray;
-//const MJS_FLOAT_ARRAY_TYPE = Float32Array;
+// const MJS_FLOAT_ARRAY_TYPE = WebGLFloatArray;
+const MJS_FLOAT_ARRAY_TYPE = Float32Array;
 //const MJS_FLOAT_ARRAY_TYPE = Float64Array;
 //const MJS_FLOAT_ARRAY_TYPE = Array;
 
