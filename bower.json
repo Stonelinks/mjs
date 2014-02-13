@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "homepage": "https://github.com/Stonelinks/mjs",
   "authors": [
-    "Lucas Doyle <lukedoyle@mujin.co.jp>"
+    "Lucas Doyle <lucas.p.doyle@gmail.com>"
   ],
   "description": "A JavaScript vector and matrix math library, optimized for WebGL usage",
   "keywords": [
