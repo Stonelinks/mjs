@@ -1839,6 +1839,7 @@ M4x4.transformLineAffine = function M4x4_transformLineAffine(m, v, r) {
 
 // for AMD shimming:
 var mjs = {
+  FLOAT_ARRAY_TYPE: MJS_FLOAT_ARRAY_TYPE,
   V3: V3,
   M4x4: M4x4
 };
