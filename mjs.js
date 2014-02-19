@@ -66,8 +66,8 @@ const MJS_DO_ASSERT = true;
  * will be of this type.
  */
 // const MJS_FLOAT_ARRAY_TYPE = WebGLFloatArray;
-const MJS_FLOAT_ARRAY_TYPE = Float32Array;
-//const MJS_FLOAT_ARRAY_TYPE = Float64Array;
+// const MJS_FLOAT_ARRAY_TYPE = Float32Array;
+const MJS_FLOAT_ARRAY_TYPE = Float64Array;
 //const MJS_FLOAT_ARRAY_TYPE = Array;
 
 if (MJS_DO_ASSERT) {
