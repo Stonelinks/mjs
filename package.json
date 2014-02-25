@@ -1,0 +1,29 @@
+{
+  "name": "mjs",
+  "version": "0.0.2",
+  "description": "A JavaScript vector and matrix math library, optimized for WebGL usage",
+  "main": "mjs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Stonelinks/mjs.git"
+  },
+  "keywords": [
+    "math",
+    "matrix",
+    "webgl",
+    "vector"
+  ],
+  "author": "Lucas Doyle <lucas.p.doyle@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Stonelinks/mjs/issues"
+  },
+  "homepage": "https://github.com/Stonelinks/mjs",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-docco": "~0.3.3"
+  }
+}

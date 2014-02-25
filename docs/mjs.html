@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>mjs.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>mjs.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/* -*- Mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40; -*- */</span>
+<span class="hljs-comment">/*
+ * Copyright (c) 2010 Mozilla Corporation
+ * Copyright (c) 2010 Vladimir Vukicevic
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */</span>
+
+<span class="hljs-comment">/*
+ * File: mjs
+ *
+ * Vector and Matrix math utilities for JavaScript, optimized for WebGL.
+ */</span>
+
+define([], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
+
+<span class="hljs-comment">/*
+ * Constant: MJS_VERSION
+ *
+ * mjs version number aa.bb.cc, encoded as an integer of the form:
+ * 0xaabbcc.
+ */</span>
+<span class="hljs-keyword">const</span> MJS_VERSION = <span class="hljs-number">0x000000</span>;
+
+<span class="hljs-comment">/*
+ * Constant: MJS_DO_ASSERT
+ *
+ * Enables or disables runtime assertions.
+ *
+ * For potentially more performance, the assert methods can be
+ * commented out in each place where they are called.
+ */</span>
+<span class="hljs-keyword">const</span> MJS_DO_ASSERT = <span class="hljs-literal">true</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Some hacks for running in both the shell and browser,
+and for supporting F32 and WebGLFloat arrays
+try { WebGLFloatArray  undefined; } catch (x) { WebGLFloatArray = Float32Array; }</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-comment">/*
+ * Constant: MJS_FLOAT_ARRAY_TYPE
+ *
+ * The base float array type.  By default, WebGLFloatArray.
+ *
+ * mjs can work with any array-like elements, but if an array
+ * creation is requested, it will create an array of the type
+ * MJS_FLOAT_ARRAY_TYPE.  Also, the builtin constants such as (M4x4.I)
+ * will be of this type.
+ */</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>const MJS_FLOAT_ARRAY_TYPE = WebGLFloatArray;
+const MJS_FLOAT_ARRAY_TYPE = Float32Array;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> MJS_FLOAT_ARRAY_TYPE = <span class="hljs-built_in">Float64Array</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>const MJS_FLOAT_ARRAY_TYPE = Array;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">if</span> (MJS_DO_ASSERT) {
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MathUtils_assert</span><span class="hljs-params">(cond, msg)</span> {</span>
+    <span class="hljs-keyword">if</span> (!cond)
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">"Assertion failed: "</span> + msg;
+}
+} <span class="hljs-keyword">else</span> {
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MathUtils_assert</span><span class="hljs-params">()</span> {</span> }
+}
+
+<span class="hljs-comment">/*
+ * Class: V3
+ *
+ * Methods for working with 3-element vectors.  A vector is represented by a 3-element array.
+ * Any valid JavaScript array type may be used, but if new
+ * vectors are created they are created using the configured MJS_FLOAT_ARRAY_TYPE.
+ */</span>
+
+<span class="hljs-keyword">var</span> V3 = { };
+
+V3._temp1 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+V3._temp2 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+V3._temp3 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+
+<span class="hljs-keyword">if</span> (MJS_FLOAT_ARRAY_TYPE == <span class="hljs-built_in">Array</span>) {
+    V3.x = [<span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>];
+    V3.y = [<span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>];
+    V3.z = [<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>];
+
+    V3.$ = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_$</span><span class="hljs-params">(x, y, z)</span> {</span>
+        <span class="hljs-keyword">return</span> [x, y, z];
+    };
+
+    V3.clone = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_clone</span><span class="hljs-params">(a)</span> {</span>
+        MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+        <span class="hljs-keyword">return</span> [a[<span class="hljs-number">0</span>], a[<span class="hljs-number">1</span>], a[<span class="hljs-number">2</span>]];
+    };
+} <span class="hljs-keyword">else</span> {
+    V3.x = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE([<span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>]);
+    V3.y = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE([<span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>]);
+    V3.z = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE([<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>]);
+
+<span class="hljs-comment">/*
+ * Function: V3.$
+ *
+ * Creates a new 3-element vector with the given values.
+ *
+ * Parameters:
+ *
+ *   x,y,z - the 3 elements of the new vector.
+ *
+ * Returns:
+ *
+ * A new vector containing with the given argument values.
+ */</span>
+
+    V3.$ = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_$</span><span class="hljs-params">(x, y, z)</span> {</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE([x, y, z]);
+    };
+
+<span class="hljs-comment">/*
+ * Function: V3.clone
+ *
+ * Clone the given 3-element vector.
+ *
+ * Parameters:
+ *
+ *   a - the 3-element vector to clone
+ *
+ * Returns:
+ *
+ * A new vector with the same values as the passed-in one.
+ */</span>
+
+    V3.clone = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_clone</span><span class="hljs-params">(a)</span> {</span>
+        MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(a);
+    };
+}
+
+V3.u = V3.x;
+V3.v = V3.y;
+
+<span class="hljs-comment">/*
+ * Function: V3.add
+ *
+ * Perform r = a + b.
+ *
+ * Parameters:
+ *
+ *   a - the first vector operand
+ *   b - the second vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.add = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_add</span><span class="hljs-params">(a, b, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] + b[<span class="hljs-number">0</span>];
+    r[<span class="hljs-number">1</span>] = a[<span class="hljs-number">1</span>] + b[<span class="hljs-number">1</span>];
+    r[<span class="hljs-number">2</span>] = a[<span class="hljs-number">2</span>] + b[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.sub
+ *
+ * Perform
+ * r = a - b.
+ *
+ * Parameters:
+ *
+ *   a - the first vector operand
+ *   b - the second vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.sub = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_sub</span><span class="hljs-params">(a, b, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] - b[<span class="hljs-number">0</span>];
+    r[<span class="hljs-number">1</span>] = a[<span class="hljs-number">1</span>] - b[<span class="hljs-number">1</span>];
+    r[<span class="hljs-number">2</span>] = a[<span class="hljs-number">2</span>] - b[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.neg
+ *
+ * Perform
+ * r = - a.
+ *
+ * Parameters:
+ *
+ *   a - the vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.neg = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_neg</span><span class="hljs-params">(a, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    r[<span class="hljs-number">0</span>] = - a[<span class="hljs-number">0</span>];
+    r[<span class="hljs-number">1</span>] = - a[<span class="hljs-number">1</span>];
+    r[<span class="hljs-number">2</span>] = - a[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.direction
+ *
+ * Perform
+ * r = (a - b) / |a - b|.  The result is the normalized
+ * direction from a to b.
+ *
+ * Parameters:
+ *
+ *   a - the first vector operand
+ *   b - the second vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.direction = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_direction</span><span class="hljs-params">(a, b, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    <span class="hljs-keyword">return</span> V3.normalize(V3.sub(a, b, r), r);
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.length
+ *
+ * Perform r = |a|.
+ *
+ * Parameters:
+ *
+ *   a - the vector operand
+ *
+ * Returns:
+ *
+ *   The length of the given vector.
+ */</span>
+V3.length = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_length</span><span class="hljs-params">(a)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.sqrt(a[<span class="hljs-number">0</span>]*a[<span class="hljs-number">0</span>] + a[<span class="hljs-number">1</span>]*a[<span class="hljs-number">1</span>] + a[<span class="hljs-number">2</span>]*a[<span class="hljs-number">2</span>]);
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.lengthSquard
+ *
+ * Perform r = |a|*|a|.
+ *
+ * Parameters:
+ *
+ *   a - the vector operand
+ *
+ * Returns:
+ *
+ *   The square of the length of the given vector.
+ */</span>
+V3.lengthSquared = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_lengthSquared</span><span class="hljs-params">(a)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+
+    <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>]*a[<span class="hljs-number">0</span>] + a[<span class="hljs-number">1</span>]*a[<span class="hljs-number">1</span>] + a[<span class="hljs-number">2</span>]*a[<span class="hljs-number">2</span>];
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.normalize
+ *
+ * Perform r = a / |a|.
+ *
+ * Parameters:
+ *
+ *   a - the vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.normalize = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_normalize</span><span class="hljs-params">(a, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    <span class="hljs-keyword">var</span> im = <span class="hljs-number">1.0</span> / V3.length(a);
+    r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] * im;
+    r[<span class="hljs-number">1</span>] = a[<span class="hljs-number">1</span>] * im;
+    r[<span class="hljs-number">2</span>] = a[<span class="hljs-number">2</span>] * im;
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.scale
+ *
+ * Perform r = a * k.
+ *
+ * Parameters:
+ *
+ *   a - the vector operand
+ *   k - a scalar value
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.scale = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_scale</span><span class="hljs-params">(a, k, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] * k;
+    r[<span class="hljs-number">1</span>] = a[<span class="hljs-number">1</span>] * k;
+    r[<span class="hljs-number">2</span>] = a[<span class="hljs-number">2</span>] * k;
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.dot
+ *
+ * Perform
+ * r = dot(a, b).
+ *
+ * Parameters:
+ *
+ *   a - the first vector operand
+ *   b - the second vector operand
+ *
+ * Returns:
+ *
+ *   The dot product of a and b.
+ */</span>
+V3.dot = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_dot</span><span class="hljs-params">(a, b)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
+
+    <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>] * b[<span class="hljs-number">0</span>] +
+        a[<span class="hljs-number">1</span>] * b[<span class="hljs-number">1</span>] +
+        a[<span class="hljs-number">2</span>] * b[<span class="hljs-number">2</span>];
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.cross
+ *
+ * Perform r = a x b.
+ *
+ * Parameters:
+ *
+ *   a - the first vector operand
+ *   b - the second vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ */</span>
+V3.cross = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_cross</span><span class="hljs-params">(a, b, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">1</span>]*b[<span class="hljs-number">2</span>] - a[<span class="hljs-number">2</span>]*b[<span class="hljs-number">1</span>];
+    r[<span class="hljs-number">1</span>] = a[<span class="hljs-number">2</span>]*b[<span class="hljs-number">0</span>] - a[<span class="hljs-number">0</span>]*b[<span class="hljs-number">2</span>];
+    r[<span class="hljs-number">2</span>] = a[<span class="hljs-number">0</span>]*b[<span class="hljs-number">1</span>] - a[<span class="hljs-number">1</span>]*b[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: V3.mul4x4
+ *
+ * Perform
+ * r = m * v.
+ *
+ * Parameters:
+ *
+ *   m - the 4x4 matrix operand
+ *   v - the 3-element vector operand
+ *   r - optional vector to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3-element vector with the result.
+ *   The 4-element result vector is divided by the w component
+ *   and returned as a 3-element vector.
+ */</span>
+V3.mul4x4 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_mul4x4</span><span class="hljs-params">(m, v, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+
+    <span class="hljs-keyword">var</span> w;
+    <span class="hljs-keyword">var</span> tmp = V3._temp1;
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+    tmp[<span class="hljs-number">0</span>] = m[ <span class="hljs-number">3</span>];
+    tmp[<span class="hljs-number">1</span>] = m[ <span class="hljs-number">7</span>];
+    tmp[<span class="hljs-number">2</span>] = m[<span class="hljs-number">11</span>];
+    w    =  V3.dot(v, tmp) + m[<span class="hljs-number">15</span>];
+    tmp[<span class="hljs-number">0</span>] = m[ <span class="hljs-number">0</span>];
+    tmp[<span class="hljs-number">1</span>] = m[ <span class="hljs-number">4</span>];
+    tmp[<span class="hljs-number">2</span>] = m[ <span class="hljs-number">8</span>];
+    r[<span class="hljs-number">0</span>] = (V3.dot(v, tmp) + m[<span class="hljs-number">12</span>])/w;
+    tmp[<span class="hljs-number">0</span>] = m[ <span class="hljs-number">1</span>];
+    tmp[<span class="hljs-number">1</span>] = m[ <span class="hljs-number">5</span>];
+    tmp[<span class="hljs-number">2</span>] = m[ <span class="hljs-number">9</span>];
+    r[<span class="hljs-number">1</span>] = (V3.dot(v, tmp) + m[<span class="hljs-number">13</span>])/w;
+    tmp[<span class="hljs-number">0</span>] = m[ <span class="hljs-number">2</span>];
+    tmp[<span class="hljs-number">1</span>] = m[ <span class="hljs-number">6</span>];
+    tmp[<span class="hljs-number">2</span>] = m[<span class="hljs-number">10</span>];
+    r[<span class="hljs-number">2</span>] = (V3.dot(v, tmp) + m[<span class="hljs-number">14</span>])/w;
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Class: M4x4
+ *
+ * Methods for working with 4x4 matrices.  A matrix is represented by a 16-element array
+ * in column-major order.  Any valid JavaScript array type may be used, but if new
+ * matrices are created they are created using the configured MJS_FLOAT_ARRAY_TYPE.
+ */</span>
+
+<span class="hljs-keyword">var</span> M4x4 = { };
+
+M4x4._temp1 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+M4x4._temp2 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+<span class="hljs-keyword">if</span> (MJS_FLOAT_ARRAY_TYPE == <span class="hljs-built_in">Array</span>) {
+    M4x4.I = [<span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>,
+              <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>,
+              <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>,
+              <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>];
+
+    M4x4.$ = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_$</span><span class="hljs-params">(m00, m01, m02, m03,
+                             m04, m05, m06, m07,
+                             m08, m09, m10, m11,
+                             m12, m13, m14, m15)</span>
+    {</span>
+        <span class="hljs-keyword">return</span> [m00, m01, m02, m03,
+                m04, m05, m06, m07,
+                m08, m09, m10, m11,
+                m12, m13, m14, m15];
+    };
+
+    M4x4.clone = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_clone</span><span class="hljs-params">(m)</span> {</span>
+        MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> [m[<span class="hljs-number">0</span>], m[<span class="hljs-number">1</span>], m[<span class="hljs-number">2</span>], m[<span class="hljs-number">3</span>],
+                    m[<span class="hljs-number">4</span>], m[<span class="hljs-number">5</span>], m[<span class="hljs-number">6</span>], m[<span class="hljs-number">7</span>],
+                    m[<span class="hljs-number">8</span>], m[<span class="hljs-number">9</span>], m[<span class="hljs-number">10</span>], m[<span class="hljs-number">11</span>],
+                    m[<span class="hljs-number">12</span>], m[<span class="hljs-number">13</span>], m[<span class="hljs-number">14</span>], m[<span class="hljs-number">15</span>]];
+    };
+} <span class="hljs-keyword">else</span> {
+    M4x4.I = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE([<span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>,
+                                   <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>,
+                                   <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>,
+                                   <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>]);
+
+<span class="hljs-comment">/*
+ * Function: M4x4.$
+ *
+ * Creates a new 4x4 matrix with the given values.
+ *
+ * Parameters:
+ *
+ *   m00..m15 - the 16 elements of the new matrix.
+ *
+ * Returns:
+ *
+ * A new matrix filled with the given argument values.
+ */</span>
+    M4x4.$ = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_$</span><span class="hljs-params">(m00, m01, m02, m03,
+                             m04, m05, m06, m07,
+                             m08, m09, m10, m11,
+                             m12, m13, m14, m15)</span>
+    {</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE([m00, m01, m02, m03,
+                                         m04, m05, m06, m07,
+                                         m08, m09, m10, m11,
+                                         m12, m13, m14, m15]);
+    };
+
+<span class="hljs-comment">/*
+ * Function: M4x4.clone
+ *
+ * Clone the given 4x4 matrix.
+ *
+ * Parameters:
+ *
+ *   m - the 4x4 matrix to clone
+ *
+ * Returns:
+ *
+ * A new matrix with the same values as the passed-in one.
+ */</span>
+    M4x4.clone = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_clone</span><span class="hljs-params">(m)</span> {</span>
+        MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(m);
+    };
+}
+
+M4x4.identity = M4x4.I;
+
+<span class="hljs-comment">/*
+ * Function: M4x4.topLeft3x3
+ *
+ * Return the top left 3x3 matrix from the given 4x4 matrix m.
+ *
+ * Parameters:
+ *
+ *   m - the matrix
+ *   r - optional 3x3 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3x3 matrix with the result.
+ */</span>
+M4x4.topLeft3x3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_topLeft3x3</span><span class="hljs-params">(m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">9</span>, <span class="hljs-string">"r == undefined || r.length == 9"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">9</span>);
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>]; r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>]; r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>];
+    r[<span class="hljs-number">3</span>] = m[<span class="hljs-number">4</span>]; r[<span class="hljs-number">4</span>] = m[<span class="hljs-number">5</span>]; r[<span class="hljs-number">5</span>] = m[<span class="hljs-number">6</span>];
+    r[<span class="hljs-number">6</span>] = m[<span class="hljs-number">8</span>]; r[<span class="hljs-number">7</span>] = m[<span class="hljs-number">9</span>]; r[<span class="hljs-number">8</span>] = m[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.inverseOrthonormal
+ *
+ * Computes the inverse of the given matrix m, assuming that
+ * the matrix is orthonormal.
+ *
+ * Parameters:
+ *
+ *   m - the matrix
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.inverseOrthonormal = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_inverseOrthonormal</span><span class="hljs-params">(m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    MathUtils_assert(m != r, <span class="hljs-string">"m != r"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+    M4x4.transpose(m, r);
+    <span class="hljs-keyword">var</span> t = [m[<span class="hljs-number">12</span>], m[<span class="hljs-number">13</span>], m[<span class="hljs-number">14</span>]];
+    r[<span class="hljs-number">3</span>] = r[<span class="hljs-number">7</span>] = r[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">12</span>] = -V3.dot([r[<span class="hljs-number">0</span>], r[<span class="hljs-number">4</span>], r[<span class="hljs-number">8</span>]], t);
+    r[<span class="hljs-number">13</span>] = -V3.dot([r[<span class="hljs-number">1</span>], r[<span class="hljs-number">5</span>], r[<span class="hljs-number">9</span>]], t);
+    r[<span class="hljs-number">14</span>] = -V3.dot([r[<span class="hljs-number">2</span>], r[<span class="hljs-number">6</span>], r[<span class="hljs-number">10</span>]], t);
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.inverseTo3x3
+ *
+ * Computes the inverse of the given matrix m, but calculates
+ * only the top left 3x3 values of the result.
+ *
+ * Parameters:
+ *
+ *   m - the matrix
+ *   r - optional 3x3 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 3x3 matrix with the result.
+ */</span>
+M4x4.inverseTo3x3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_inverseTo3x3</span><span class="hljs-params">(m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">9</span>, <span class="hljs-string">"r == undefined || r.length == 9"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">9</span>);
+
+    <span class="hljs-keyword">var</span> a11 = m[<span class="hljs-number">10</span>]*m[<span class="hljs-number">5</span>]-m[<span class="hljs-number">6</span>]*m[<span class="hljs-number">9</span>],
+        a21 = -m[<span class="hljs-number">10</span>]*m[<span class="hljs-number">1</span>]+m[<span class="hljs-number">2</span>]*m[<span class="hljs-number">9</span>],
+        a31 = m[<span class="hljs-number">6</span>]*m[<span class="hljs-number">1</span>]-m[<span class="hljs-number">2</span>]*m[<span class="hljs-number">5</span>],
+        a12 = -m[<span class="hljs-number">10</span>]*m[<span class="hljs-number">4</span>]+m[<span class="hljs-number">6</span>]*m[<span class="hljs-number">8</span>],
+        a22 = m[<span class="hljs-number">10</span>]*m[<span class="hljs-number">0</span>]-m[<span class="hljs-number">2</span>]*m[<span class="hljs-number">8</span>],
+        a32 = -m[<span class="hljs-number">6</span>]*m[<span class="hljs-number">0</span>]+m[<span class="hljs-number">2</span>]*m[<span class="hljs-number">4</span>],
+        a13 = m[<span class="hljs-number">9</span>]*m[<span class="hljs-number">4</span>]-m[<span class="hljs-number">5</span>]*m[<span class="hljs-number">8</span>],
+        a23 = -m[<span class="hljs-number">9</span>]*m[<span class="hljs-number">0</span>]+m[<span class="hljs-number">1</span>]*m[<span class="hljs-number">8</span>],
+        a33 = m[<span class="hljs-number">5</span>]*m[<span class="hljs-number">0</span>]-m[<span class="hljs-number">1</span>]*m[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> det = m[<span class="hljs-number">0</span>]*(a11) + m[<span class="hljs-number">1</span>]*(a12) + m[<span class="hljs-number">2</span>]*(a13);
+    <span class="hljs-keyword">if</span> (det == <span class="hljs-number">0</span>) <span class="hljs-comment">// no inverse</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">"matrix not invertible"</span>;
+    <span class="hljs-keyword">var</span> idet = <span class="hljs-number">1.0</span> / det;
+
+    r[<span class="hljs-number">0</span>] = idet*a11;
+    r[<span class="hljs-number">1</span>] = idet*a21;
+    r[<span class="hljs-number">2</span>] = idet*a31;
+    r[<span class="hljs-number">3</span>] = idet*a12;
+    r[<span class="hljs-number">4</span>] = idet*a22;
+    r[<span class="hljs-number">5</span>] = idet*a32;
+    r[<span class="hljs-number">6</span>] = idet*a13;
+    r[<span class="hljs-number">7</span>] = idet*a23;
+    r[<span class="hljs-number">8</span>] = idet*a33;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeFrustum
+ *
+ * Creates a matrix for a projection frustum with the given parameters.
+ *
+ * Parameters:
+ *
+ *   left - the left coordinate of the frustum
+ *   right- the right coordinate of the frustum
+ *   bottom - the bottom coordinate of the frustum
+ *   top - the top coordinate of the frustum
+ *   znear - the near z distance of the frustum
+ *   zfar - the far z distance of the frustum
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the projection matrix.
+ *   Otherwise, returns a new 4x4 matrix.
+ */</span>
+M4x4.makeFrustum = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeFrustum</span><span class="hljs-params">(left, right, bottom, top, znear, zfar, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    <span class="hljs-keyword">var</span> X = <span class="hljs-number">2</span>*znear/(right-left);
+    <span class="hljs-keyword">var</span> Y = <span class="hljs-number">2</span>*znear/(top-bottom);
+    <span class="hljs-keyword">var</span> A = (right+left)/(right-left);
+    <span class="hljs-keyword">var</span> B = (top+bottom)/(top-bottom);
+    <span class="hljs-keyword">var</span> C = -(zfar+znear)/(zfar-znear);
+    <span class="hljs-keyword">var</span> D = -<span class="hljs-number">2</span>*zfar*znear/(zfar-znear);
+
+    r[<span class="hljs-number">0</span>] = <span class="hljs-number">2</span>*znear/(right-left);
+    r[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">5</span>] = <span class="hljs-number">2</span>*znear/(top-bottom);
+    r[<span class="hljs-number">6</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">8</span>] = (right+left)/(right-left);
+    r[<span class="hljs-number">9</span>] = (top+bottom)/(top-bottom);
+    r[<span class="hljs-number">10</span>] = -(zfar+znear)/(zfar-znear);
+    r[<span class="hljs-number">11</span>] = -<span class="hljs-number">1</span>;
+    r[<span class="hljs-number">12</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">13</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">14</span>] = -<span class="hljs-number">2</span>*zfar*znear/(zfar-znear);
+    r[<span class="hljs-number">15</span>] = <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makePerspective
+ *
+ * Creates a matrix for a perspective projection with the given parameters.
+ *
+ * Parameters:
+ *
+ *   fovy - field of view in the y axis, in degrees
+ *   aspect - aspect ratio
+ *   znear - the near z distance of the projection
+ *   zfar - the far z distance of the projection
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the projection matrix.
+ *   Otherwise, returns a new 4x4 matrix.
+ */</span>
+M4x4.makePerspective = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makePerspective</span> <span class="hljs-params">(fovy, aspect, znear, zfar, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">var</span> ymax = znear * <span class="hljs-built_in">Math</span>.tan(fovy * <span class="hljs-built_in">Math</span>.PI / <span class="hljs-number">360.0</span>);
+    <span class="hljs-keyword">var</span> ymin = -ymax;
+    <span class="hljs-keyword">var</span> xmin = ymin * aspect;
+    <span class="hljs-keyword">var</span> xmax = ymax * aspect;
+
+    <span class="hljs-keyword">return</span> M4x4.makeFrustum(xmin, xmax, ymin, ymax, znear, zfar, r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeOrtho
+ *
+ * Creates a matrix for an orthogonal frustum projection with the given parameters.
+ *
+ * Parameters:
+ *
+ *   left - the left coordinate of the frustum
+ *   right- the right coordinate of the frustum
+ *   bottom - the bottom coordinate of the frustum
+ *   top - the top coordinate of the frustum
+ *   znear - the near z distance of the frustum
+ *   zfar - the far z distance of the frustum
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the projection matrix.
+ *   Otherwise, returns a new 4x4 matrix.
+ */</span>
+M4x4.makeOrtho = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeOrtho</span> <span class="hljs-params">(left, right, bottom, top, znear, zfar, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    <span class="hljs-keyword">var</span> tX = -(right+left)/(right-left);
+    <span class="hljs-keyword">var</span> tY = -(top+bottom)/(top-bottom);
+    <span class="hljs-keyword">var</span> tZ = -(zfar+znear)/(zfar-znear);
+    <span class="hljs-keyword">var</span> X = <span class="hljs-number">2</span> / (right-left);
+    <span class="hljs-keyword">var</span> Y = <span class="hljs-number">2</span> / (top-bottom);
+    <span class="hljs-keyword">var</span> Z = -<span class="hljs-number">2</span> / (zfar-znear);
+
+    r[<span class="hljs-number">0</span>] = <span class="hljs-number">2</span> / (right-left);
+    r[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">5</span>] = <span class="hljs-number">2</span> / (top-bottom);
+    r[<span class="hljs-number">6</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">8</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">9</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">10</span>] = -<span class="hljs-number">2</span> / (zfar-znear);
+    r[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">12</span>] = -(right+left)/(right-left);
+    r[<span class="hljs-number">13</span>] = -(top+bottom)/(top-bottom);
+    r[<span class="hljs-number">14</span>] = -(zfar+znear)/(zfar-znear);
+    r[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeOrtho
+ *
+ * Creates a matrix for a 2D orthogonal frustum projection with the given parameters.
+ * znear and zfar are assumed to be -1 and 1, respectively.
+ *
+ * Parameters:
+ *
+ *   left - the left coordinate of the frustum
+ *   right- the right coordinate of the frustum
+ *   bottom - the bottom coordinate of the frustum
+ *   top - the top coordinate of the frustum
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the projection matrix.
+ *   Otherwise, returns a new 4x4 matrix.
+ */</span>
+M4x4.makeOrtho2D = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeOrtho2D</span> <span class="hljs-params">(left, right, bottom, top, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">return</span> M4x4.makeOrtho(left, right, bottom, top, -<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.mul
+ *
+ * Performs r = a * b.
+ *
+ * Parameters:
+ *
+ *   a - the first matrix operand
+ *   b - the second matrix operand
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.mul = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_mul</span><span class="hljs-params">(a, b, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">16</span>, <span class="hljs-string">"a.length == 16"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    MathUtils_assert(a != r &amp;&amp; b != r, <span class="hljs-string">"a != r &amp;&amp; b != r"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    <span class="hljs-keyword">var</span> a11 = a[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> a21 = a[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> a31 = a[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> a41 = a[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> a12 = a[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> a22 = a[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> a32 = a[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> a42 = a[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> a13 = a[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> a23 = a[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> a33 = a[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> a43 = a[<span class="hljs-number">11</span>];
+    <span class="hljs-keyword">var</span> a14 = a[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> a24 = a[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> a34 = a[<span class="hljs-number">14</span>];
+    <span class="hljs-keyword">var</span> a44 = a[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">var</span> b11 = b[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> b21 = b[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> b31 = b[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> b41 = b[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> b12 = b[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> b22 = b[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> b32 = b[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> b42 = b[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> b13 = b[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> b23 = b[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> b33 = b[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> b43 = b[<span class="hljs-number">11</span>];
+    <span class="hljs-keyword">var</span> b14 = b[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> b24 = b[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> b34 = b[<span class="hljs-number">14</span>];
+    <span class="hljs-keyword">var</span> b44 = b[<span class="hljs-number">15</span>];
+
+    r[<span class="hljs-number">0</span>] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+    r[<span class="hljs-number">1</span>] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+    r[<span class="hljs-number">2</span>] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+    r[<span class="hljs-number">3</span>] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+    r[<span class="hljs-number">4</span>] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+    r[<span class="hljs-number">5</span>] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+    r[<span class="hljs-number">6</span>] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+    r[<span class="hljs-number">7</span>] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+    r[<span class="hljs-number">8</span>] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+    r[<span class="hljs-number">9</span>] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+    r[<span class="hljs-number">10</span>] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+    r[<span class="hljs-number">11</span>] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+    r[<span class="hljs-number">12</span>] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+    r[<span class="hljs-number">13</span>] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+    r[<span class="hljs-number">14</span>] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+    r[<span class="hljs-number">15</span>] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.mulOffset
+ *
+ * Performs r' = a * b, where r' is the 16 elements of r starting at element o.
+ *
+ * Parameters:
+ *
+ *   a - the first matrix operand
+ *   b - the second matrix operand
+ *   r - array to store the result in
+ *   o - offset into r at which to start storing results
+ *
+ * Returns:
+ *
+ *   r
+ */</span>
+M4x4.mulOffset = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_mulOffset</span><span class="hljs-params">(a, b, r, o)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">16</span>, <span class="hljs-string">"a.length == 16"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
+
+    <span class="hljs-keyword">var</span> a21 = a[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> a31 = a[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> a41 = a[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> a12 = a[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> a22 = a[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> a32 = a[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> a42 = a[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> a13 = a[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> a23 = a[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> a33 = a[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> a43 = a[<span class="hljs-number">11</span>];
+    <span class="hljs-keyword">var</span> a14 = a[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> a24 = a[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> a34 = a[<span class="hljs-number">14</span>];
+    <span class="hljs-keyword">var</span> a44 = a[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">var</span> b11 = b[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> b21 = b[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> b31 = b[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> b41 = b[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> b12 = b[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> b22 = b[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> b32 = b[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> b42 = b[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> b13 = b[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> b23 = b[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> b33 = b[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> b43 = b[<span class="hljs-number">11</span>];
+    <span class="hljs-keyword">var</span> b14 = b[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> b24 = b[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> b34 = b[<span class="hljs-number">14</span>];
+    <span class="hljs-keyword">var</span> b44 = b[<span class="hljs-number">15</span>];
+
+    r[o+<span class="hljs-number">0</span>] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+    r[o+<span class="hljs-number">1</span>] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+    r[o+<span class="hljs-number">2</span>] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+    r[o+<span class="hljs-number">3</span>] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+    r[o+<span class="hljs-number">4</span>] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+    r[o+<span class="hljs-number">5</span>] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+    r[o+<span class="hljs-number">6</span>] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+    r[o+<span class="hljs-number">7</span>] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+    r[o+<span class="hljs-number">8</span>] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+    r[o+<span class="hljs-number">9</span>] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+    r[o+<span class="hljs-number">10</span>] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+    r[o+<span class="hljs-number">11</span>] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+    r[o+<span class="hljs-number">12</span>] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+    r[o+<span class="hljs-number">13</span>] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+    r[o+<span class="hljs-number">14</span>] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+    r[o+<span class="hljs-number">15</span>] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.mulAffine
+ *
+ * Performs r = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1)
+ *
+ * Parameters:
+ *
+ *   a - the first matrix operand
+ *   b - the second matrix operand
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.mulAffine = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_mulAffine</span><span class="hljs-params">(a, b, r)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">16</span>, <span class="hljs-string">"a.length == 16"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    MathUtils_assert(a != r &amp;&amp; b != r, <span class="hljs-string">"a != r &amp;&amp; b != r"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+    <span class="hljs-keyword">var</span> a11 = a[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> a21 = a[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> a31 = a[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> a12 = a[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> a22 = a[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> a32 = a[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> a13 = a[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> a23 = a[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> a33 = a[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> a14 = a[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> a24 = a[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> a34 = a[<span class="hljs-number">14</span>];
+
+    <span class="hljs-keyword">var</span> b11 = b[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> b21 = b[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> b31 = b[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> b12 = b[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> b22 = b[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> b32 = b[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> b13 = b[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> b23 = b[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> b33 = b[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> b14 = b[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> b24 = b[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> b34 = b[<span class="hljs-number">14</span>];
+
+    r[<span class="hljs-number">0</span>] = a11 * b11 + a12 * b21 + a13 * b31;
+    r[<span class="hljs-number">1</span>] = a21 * b11 + a22 * b21 + a23 * b31;
+    r[<span class="hljs-number">2</span>] = a31 * b11 + a32 * b21 + a33 * b31;
+    r[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">4</span>] = a11 * b12 + a12 * b22 + a13 * b32;
+    r[<span class="hljs-number">5</span>] = a21 * b12 + a22 * b22 + a23 * b32;
+    r[<span class="hljs-number">6</span>] = a31 * b12 + a32 * b22 + a33 * b32;
+    r[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">8</span>] = a11 * b13 + a12 * b23 + a13 * b33;
+    r[<span class="hljs-number">9</span>] = a21 * b13 + a22 * b23 + a23 * b33;
+    r[<span class="hljs-number">10</span>] = a31 * b13 + a32 * b23 + a33 * b33;
+    r[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">12</span>] = a11 * b14 + a12 * b24 + a13 * b34 + a14;
+    r[<span class="hljs-number">13</span>] = a21 * b14 + a22 * b24 + a23 * b34 + a24;
+    r[<span class="hljs-number">14</span>] = a31 * b14 + a32 * b24 + a33 * b34 + a34;
+    r[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.mulAffineOffset
+ *
+ * Performs r' = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1), where r' is the 16 elements of r starting at element o
+ *
+ * Parameters:
+ *
+ *   a - the first matrix operand
+ *   b - the second matrix operand
+ *   r - array to store the result in
+ *   o - offset into r at which to start storing results
+ *
+ * Returns:
+ *
+ *   r
+ */</span>
+M4x4.mulAffine = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_mulAffine</span><span class="hljs-params">(a, b, r, o)</span> {</span>
+    MathUtils_assert(a.length == <span class="hljs-number">16</span>, <span class="hljs-string">"a.length == 16"</span>);
+    MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+    <span class="hljs-keyword">var</span> a11 = a[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> a21 = a[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> a31 = a[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> a12 = a[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> a22 = a[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> a32 = a[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> a13 = a[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> a23 = a[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> a33 = a[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> a14 = a[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> a24 = a[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> a34 = a[<span class="hljs-number">14</span>];
+
+    <span class="hljs-keyword">var</span> b11 = b[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> b21 = b[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> b31 = b[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> b12 = b[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> b22 = b[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> b32 = b[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> b13 = b[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> b23 = b[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> b33 = b[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> b14 = b[<span class="hljs-number">12</span>];
+    <span class="hljs-keyword">var</span> b24 = b[<span class="hljs-number">13</span>];
+    <span class="hljs-keyword">var</span> b34 = b[<span class="hljs-number">14</span>];
+
+    r[o+<span class="hljs-number">0</span>] = a11 * b11 + a12 * b21 + a13 * b31;
+    r[o+<span class="hljs-number">1</span>] = a21 * b11 + a22 * b21 + a23 * b31;
+    r[o+<span class="hljs-number">2</span>] = a31 * b11 + a32 * b21 + a33 * b31;
+    r[o+<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[o+<span class="hljs-number">4</span>] = a11 * b12 + a12 * b22 + a13 * b32;
+    r[o+<span class="hljs-number">5</span>] = a21 * b12 + a22 * b22 + a23 * b32;
+    r[o+<span class="hljs-number">6</span>] = a31 * b12 + a32 * b22 + a33 * b32;
+    r[o+<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[o+<span class="hljs-number">8</span>] = a11 * b13 + a12 * b23 + a13 * b33;
+    r[o+<span class="hljs-number">9</span>] = a21 * b13 + a22 * b23 + a23 * b33;
+    r[o+<span class="hljs-number">10</span>] = a31 * b13 + a32 * b23 + a33 * b33;
+    r[o+<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[o+<span class="hljs-number">12</span>] = a11 * b14 + a12 * b24 + a13 * b34 + a14;
+    r[o+<span class="hljs-number">13</span>] = a21 * b14 + a22 * b24 + a23 * b34 + a24;
+    r[o+<span class="hljs-number">14</span>] = a31 * b14 + a32 * b24 + a33 * b34 + a34;
+    r[o+<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeRotate
+ *
+ * Creates a transformation matrix for rotation by angle radians about the 3-element vector axis.
+ *
+ * Parameters:
+ *
+ *   angle - the angle of rotation, in radians
+ *   axis - the axis around which the rotation is performed, a 3-element vector
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the matrix.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.makeRotate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeRotate</span><span class="hljs-params">(angle, axis, r)</span> {</span>
+    MathUtils_assert(angle.length == <span class="hljs-number">3</span>, <span class="hljs-string">"angle.length == 3"</span>);
+    MathUtils_assert(axis.length == <span class="hljs-number">3</span>, <span class="hljs-string">"axis.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    axis = V3.normalize(axis, V3._temp1);
+    <span class="hljs-keyword">var</span> x = axis[<span class="hljs-number">0</span>], y = axis[<span class="hljs-number">1</span>], z = axis[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> c = <span class="hljs-built_in">Math</span>.cos(angle);
+    <span class="hljs-keyword">var</span> c1 = <span class="hljs-number">1</span>-c;
+    <span class="hljs-keyword">var</span> s = <span class="hljs-built_in">Math</span>.sin(angle);
+
+    r[<span class="hljs-number">0</span>] = x*x*c1+c;
+    r[<span class="hljs-number">1</span>] = y*x*c1+z*s;
+    r[<span class="hljs-number">2</span>] = z*x*c1-y*s;
+    r[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">4</span>] = x*y*c1-z*s;
+    r[<span class="hljs-number">5</span>] = y*y*c1+c;
+    r[<span class="hljs-number">6</span>] = y*z*c1+x*s;
+    r[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">8</span>] = x*z*c1+y*s;
+    r[<span class="hljs-number">9</span>] = y*z*c1-x*s;
+    r[<span class="hljs-number">10</span>] = z*z*c1+c;
+    r[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">12</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">13</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">14</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.rotate
+ *
+ * Concatenates a rotation of angle radians about the axis to the give matrix m.
+ *
+ * Parameters:
+ *
+ *   angle - the angle of rotation, in radians
+ *   axis - the axis around which the rotation is performed, a 3-element vector
+ *   m - the matrix to concatenate the rotation to
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after performing the operation.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.rotate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_rotate</span><span class="hljs-params">(angle, axis, m, r)</span> {</span>
+    MathUtils_assert(angle.length == <span class="hljs-number">3</span>, <span class="hljs-string">"angle.length == 3"</span>);
+    MathUtils_assert(axis.length == <span class="hljs-number">3</span>, <span class="hljs-string">"axis.length == 3"</span>);
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+    <span class="hljs-keyword">var</span> a0=axis [<span class="hljs-number">0</span>], a1=axis [<span class="hljs-number">1</span>], a2=axis [<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> l = <span class="hljs-built_in">Math</span>.sqrt(a0*a0 + a1*a1 + a2*a2);
+    <span class="hljs-keyword">var</span> x = a0, y = a1, z = a2;
+    <span class="hljs-keyword">if</span> (l != <span class="hljs-number">1.0</span>) {
+        <span class="hljs-keyword">var</span> im = <span class="hljs-number">1.0</span> / l;
+        x *= im;
+        y *= im;
+        z *= im;
+    }
+    <span class="hljs-keyword">var</span> c = <span class="hljs-built_in">Math</span>.cos(angle);
+    <span class="hljs-keyword">var</span> c1 = <span class="hljs-number">1</span>-c;
+    <span class="hljs-keyword">var</span> s = <span class="hljs-built_in">Math</span>.sin(angle);
+    <span class="hljs-keyword">var</span> xs = x*s;
+    <span class="hljs-keyword">var</span> ys = y*s;
+    <span class="hljs-keyword">var</span> zs = z*s;
+    <span class="hljs-keyword">var</span> xyc1 = x * y * c1;
+    <span class="hljs-keyword">var</span> xzc1 = x * z * c1;
+    <span class="hljs-keyword">var</span> yzc1 = y * z * c1;
+
+    <span class="hljs-keyword">var</span> m11 = m[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> m21 = m[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> m31 = m[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> m41 = m[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> m12 = m[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> m22 = m[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> m32 = m[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> m42 = m[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> m13 = m[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> m23 = m[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> m33 = m[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> m43 = m[<span class="hljs-number">11</span>];
+
+    <span class="hljs-keyword">var</span> t11 = x * x * c1 + c;
+    <span class="hljs-keyword">var</span> t21 = xyc1 + zs;
+    <span class="hljs-keyword">var</span> t31 = xzc1 - ys;
+    <span class="hljs-keyword">var</span> t12 = xyc1 - zs;
+    <span class="hljs-keyword">var</span> t22 = y * y * c1 + c;
+    <span class="hljs-keyword">var</span> t32 = yzc1 + xs;
+    <span class="hljs-keyword">var</span> t13 = xzc1 + ys;
+    <span class="hljs-keyword">var</span> t23 = yzc1 - xs;
+    <span class="hljs-keyword">var</span> t33 = z * z * c1 + c;
+
+    r[<span class="hljs-number">0</span>] = m11 * t11 + m12 * t21 + m13 * t31;
+    r[<span class="hljs-number">1</span>] = m21 * t11 + m22 * t21 + m23 * t31;
+    r[<span class="hljs-number">2</span>] = m31 * t11 + m32 * t21 + m33 * t31;
+    r[<span class="hljs-number">3</span>] = m41 * t11 + m42 * t21 + m43 * t31;
+    r[<span class="hljs-number">4</span>] = m11 * t12 + m12 * t22 + m13 * t32;
+    r[<span class="hljs-number">5</span>] = m21 * t12 + m22 * t22 + m23 * t32;
+    r[<span class="hljs-number">6</span>] = m31 * t12 + m32 * t22 + m33 * t32;
+    r[<span class="hljs-number">7</span>] = m41 * t12 + m42 * t22 + m43 * t32;
+    r[<span class="hljs-number">8</span>] = m11 * t13 + m12 * t23 + m13 * t33;
+    r[<span class="hljs-number">9</span>] = m21 * t13 + m22 * t23 + m23 * t33;
+    r[<span class="hljs-number">10</span>] = m31 * t13 + m32 * t23 + m33 * t33;
+    r[<span class="hljs-number">11</span>] = m41 * t13 + m42 * t23 + m43 * t33;
+    <span class="hljs-keyword">if</span> (r != m) {
+        r[<span class="hljs-number">12</span>] = m[<span class="hljs-number">12</span>];
+        r[<span class="hljs-number">13</span>] = m[<span class="hljs-number">13</span>];
+        r[<span class="hljs-number">14</span>] = m[<span class="hljs-number">14</span>];
+        r[<span class="hljs-number">15</span>] = m[<span class="hljs-number">15</span>];
+    }
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeScale3
+ *
+ * Creates a transformation matrix for scaling by 3 scalar values, one for
+ * each of the x, y, and z directions.
+ *
+ * Parameters:
+ *
+ *   x - the scale for the x axis
+ *   y - the scale for the y axis
+ *   z - the scale for the z axis
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the matrix.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.makeScale3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeScale3</span><span class="hljs-params">(x, y, z, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    r[<span class="hljs-number">0</span>] = x;
+    r[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">5</span>] = y;
+    r[<span class="hljs-number">6</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">8</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">9</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">10</span>] = z;
+    r[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">12</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">13</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">14</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeScale1
+ *
+ * Creates a transformation matrix for a uniform scale by a single scalar value.
+ *
+ * Parameters:
+ *
+ *   k - the scale factor
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the matrix.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.makeScale1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeScale1</span><span class="hljs-params">(k, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">return</span> M4x4.makeScale3(k, k, k, r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeScale
+ *
+ * Creates a transformation matrix for scaling each of the x, y, and z axes by the amount
+ * given in the corresponding element of the 3-element vector.
+ *
+ * Parameters:
+ *
+ *   v - the 3-element vector containing the scale factors
+ *   r - optional 4x4 matrix to store the result in
+ *
+ * Returns:
+ *
+ *   If r is specified, returns r after creating the matrix.
+ *   Otherwise, returns a new 4x4 matrix with the result.
+ */</span>
+M4x4.makeScale = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeScale</span><span class="hljs-params">(v, r)</span> {</span>
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">return</span> M4x4.makeScale3(v[<span class="hljs-number">0</span>], v[<span class="hljs-number">1</span>], v[<span class="hljs-number">2</span>], r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.scale3
+ */</span>
+M4x4.scale3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_scale3</span><span class="hljs-params">(x, y, z, m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == m) {
+        m[<span class="hljs-number">0</span>] *= x;
+        m[<span class="hljs-number">1</span>] *= x;
+        m[<span class="hljs-number">2</span>] *= x;
+        m[<span class="hljs-number">3</span>] *= x;
+        m[<span class="hljs-number">4</span>] *= y;
+        m[<span class="hljs-number">5</span>] *= y;
+        m[<span class="hljs-number">6</span>] *= y;
+        m[<span class="hljs-number">7</span>] *= y;
+        m[<span class="hljs-number">8</span>] *= z;
+        m[<span class="hljs-number">9</span>] *= z;
+        m[<span class="hljs-number">10</span>] *= z;
+        m[<span class="hljs-number">11</span>] *= z;
+        <span class="hljs-keyword">return</span> m;
+    }
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * x;
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * x;
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * x;
+    r[<span class="hljs-number">3</span>] = m[<span class="hljs-number">3</span>] * x;
+    r[<span class="hljs-number">4</span>] = m[<span class="hljs-number">4</span>] * y;
+    r[<span class="hljs-number">5</span>] = m[<span class="hljs-number">5</span>] * y;
+    r[<span class="hljs-number">6</span>] = m[<span class="hljs-number">6</span>] * y;
+    r[<span class="hljs-number">7</span>] = m[<span class="hljs-number">7</span>] * y;
+    r[<span class="hljs-number">8</span>] = m[<span class="hljs-number">8</span>] * z;
+    r[<span class="hljs-number">9</span>] = m[<span class="hljs-number">9</span>] * z;
+    r[<span class="hljs-number">10</span>] = m[<span class="hljs-number">10</span>] * z;
+    r[<span class="hljs-number">11</span>] = m[<span class="hljs-number">11</span>] * z;
+    r[<span class="hljs-number">12</span>] = m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">13</span>] = m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">14</span>] = m[<span class="hljs-number">14</span>];
+    r[<span class="hljs-number">15</span>] = m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.scale1
+ */</span>
+M4x4.scale1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_scale1</span><span class="hljs-params">(k, m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    <span class="hljs-keyword">if</span> (r == m) {
+        m[<span class="hljs-number">0</span>] *= k;
+        m[<span class="hljs-number">1</span>] *= k;
+        m[<span class="hljs-number">2</span>] *= k;
+        m[<span class="hljs-number">3</span>] *= k;
+        m[<span class="hljs-number">4</span>] *= k;
+        m[<span class="hljs-number">5</span>] *= k;
+        m[<span class="hljs-number">6</span>] *= k;
+        m[<span class="hljs-number">7</span>] *= k;
+        m[<span class="hljs-number">8</span>] *= k;
+        m[<span class="hljs-number">9</span>] *= k;
+        m[<span class="hljs-number">10</span>] *= k;
+        m[<span class="hljs-number">11</span>] *= k;
+        <span class="hljs-keyword">return</span> m;
+    }
+
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * k;
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * k;
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * k;
+    r[<span class="hljs-number">3</span>] = m[<span class="hljs-number">3</span>] * k;
+    r[<span class="hljs-number">4</span>] = m[<span class="hljs-number">4</span>] * k;
+    r[<span class="hljs-number">5</span>] = m[<span class="hljs-number">5</span>] * k;
+    r[<span class="hljs-number">6</span>] = m[<span class="hljs-number">6</span>] * k;
+    r[<span class="hljs-number">7</span>] = m[<span class="hljs-number">7</span>] * k;
+    r[<span class="hljs-number">8</span>] = m[<span class="hljs-number">8</span>] * k;
+    r[<span class="hljs-number">9</span>] = m[<span class="hljs-number">9</span>] * k;
+    r[<span class="hljs-number">10</span>] = m[<span class="hljs-number">10</span>] * k;
+    r[<span class="hljs-number">11</span>] = m[<span class="hljs-number">11</span>] * k;
+    r[<span class="hljs-number">12</span>] = m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">13</span>] = m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">14</span>] = m[<span class="hljs-number">14</span>];
+    r[<span class="hljs-number">15</span>] = m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.scale1
+ */</span>
+M4x4.scale = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_scale</span><span class="hljs-params">(v, m, r)</span> {</span>
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    <span class="hljs-keyword">var</span> x = v[<span class="hljs-number">0</span>], y = v[<span class="hljs-number">1</span>], z = v[<span class="hljs-number">2</span>];
+
+    <span class="hljs-keyword">if</span> (r == m) {
+        m[<span class="hljs-number">0</span>] *= x;
+        m[<span class="hljs-number">1</span>] *= x;
+        m[<span class="hljs-number">2</span>] *= x;
+        m[<span class="hljs-number">3</span>] *= x;
+        m[<span class="hljs-number">4</span>] *= y;
+        m[<span class="hljs-number">5</span>] *= y;
+        m[<span class="hljs-number">6</span>] *= y;
+        m[<span class="hljs-number">7</span>] *= y;
+        m[<span class="hljs-number">8</span>] *= z;
+        m[<span class="hljs-number">9</span>] *= z;
+        m[<span class="hljs-number">10</span>] *= z;
+        m[<span class="hljs-number">11</span>] *= z;
+        <span class="hljs-keyword">return</span> m;
+    }
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * x;
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * x;
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * x;
+    r[<span class="hljs-number">3</span>] = m[<span class="hljs-number">3</span>] * x;
+    r[<span class="hljs-number">4</span>] = m[<span class="hljs-number">4</span>] * y;
+    r[<span class="hljs-number">5</span>] = m[<span class="hljs-number">5</span>] * y;
+    r[<span class="hljs-number">6</span>] = m[<span class="hljs-number">6</span>] * y;
+    r[<span class="hljs-number">7</span>] = m[<span class="hljs-number">7</span>] * y;
+    r[<span class="hljs-number">8</span>] = m[<span class="hljs-number">8</span>] * z;
+    r[<span class="hljs-number">9</span>] = m[<span class="hljs-number">9</span>] * z;
+    r[<span class="hljs-number">10</span>] = m[<span class="hljs-number">10</span>] * z;
+    r[<span class="hljs-number">11</span>] = m[<span class="hljs-number">11</span>] * z;
+    r[<span class="hljs-number">12</span>] = m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">13</span>] = m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">14</span>] = m[<span class="hljs-number">14</span>];
+    r[<span class="hljs-number">15</span>] = m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeTranslate3
+ */</span>
+M4x4.makeTranslate3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate3</span><span class="hljs-params">(x, y, z, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    r[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>;
+    r[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">5</span>] = <span class="hljs-number">1</span>;
+    r[<span class="hljs-number">6</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">8</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">9</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">10</span>] = <span class="hljs-number">1</span>;
+    r[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    r[<span class="hljs-number">12</span>] = x;
+    r[<span class="hljs-number">13</span>] = y;
+    r[<span class="hljs-number">14</span>] = z;
+    r[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeTranslate1
+ */</span>
+M4x4.makeTranslate1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate1</span> <span class="hljs-params">(k, r)</span> {</span>
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">return</span> M4x4.makeTranslate3(k, k, k, r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeTranslate
+ */</span>
+M4x4.makeTranslate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate</span> <span class="hljs-params">(v, r)</span> {</span>
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">return</span> M4x4.makeTranslate3(v[<span class="hljs-number">0</span>], v[<span class="hljs-number">1</span>], v[<span class="hljs-number">2</span>], r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.translate3Self
+ */</span>
+M4x4.translate3Self = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translate3Self</span> <span class="hljs-params">(x, y, z, m)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    m[<span class="hljs-number">12</span>] += m[<span class="hljs-number">0</span>] * x + m[<span class="hljs-number">4</span>] * y + m[<span class="hljs-number">8</span>] * z;
+    m[<span class="hljs-number">13</span>] += m[<span class="hljs-number">1</span>] * x + m[<span class="hljs-number">5</span>] * y + m[<span class="hljs-number">9</span>] * z;
+    m[<span class="hljs-number">14</span>] += m[<span class="hljs-number">2</span>] * x + m[<span class="hljs-number">6</span>] * y + m[<span class="hljs-number">10</span>] * z;
+    m[<span class="hljs-number">15</span>] += m[<span class="hljs-number">3</span>] * x + m[<span class="hljs-number">7</span>] * y + m[<span class="hljs-number">11</span>] * z;
+    <span class="hljs-keyword">return</span> m;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.translate3
+ */</span>
+M4x4.translate3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translate3</span> <span class="hljs-params">(x, y, z, m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (r == m) {
+        m[<span class="hljs-number">12</span>] += m[<span class="hljs-number">0</span>] * x + m[<span class="hljs-number">4</span>] * y + m[<span class="hljs-number">8</span>] * z;
+        m[<span class="hljs-number">13</span>] += m[<span class="hljs-number">1</span>] * x + m[<span class="hljs-number">5</span>] * y + m[<span class="hljs-number">9</span>] * z;
+        m[<span class="hljs-number">14</span>] += m[<span class="hljs-number">2</span>] * x + m[<span class="hljs-number">6</span>] * y + m[<span class="hljs-number">10</span>] * z;
+        m[<span class="hljs-number">15</span>] += m[<span class="hljs-number">3</span>] * x + m[<span class="hljs-number">7</span>] * y + m[<span class="hljs-number">11</span>] * z;
+        <span class="hljs-keyword">return</span> m;
+    }
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    <span class="hljs-keyword">var</span> m11 = m[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> m21 = m[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> m31 = m[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> m41 = m[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> m12 = m[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> m22 = m[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> m32 = m[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> m42 = m[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> m13 = m[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> m23 = m[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> m33 = m[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> m43 = m[<span class="hljs-number">11</span>];
+
+
+    r[<span class="hljs-number">0</span>] = m11;
+    r[<span class="hljs-number">1</span>] = m21;
+    r[<span class="hljs-number">2</span>] = m31;
+    r[<span class="hljs-number">3</span>] = m41;
+    r[<span class="hljs-number">4</span>] = m12;
+    r[<span class="hljs-number">5</span>] = m22;
+    r[<span class="hljs-number">6</span>] = m32;
+    r[<span class="hljs-number">7</span>] = m42;
+    r[<span class="hljs-number">8</span>] = m13;
+    r[<span class="hljs-number">9</span>] = m23;
+    r[<span class="hljs-number">10</span>] = m33;
+    r[<span class="hljs-number">11</span>] = m43;
+    r[<span class="hljs-number">12</span>] = m11 * x + m12 * y + m13 * z + m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">13</span>] = m21 * x + m22 * y + m23 * z + m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">14</span>] = m31 * x + m32 * y + m33 * z + m[<span class="hljs-number">14</span>];
+    r[<span class="hljs-number">15</span>] = m41 * x + m42 * y + m43 * z + m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.translate1
+ */</span>
+M4x4.translate1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translate1</span> <span class="hljs-params">(k, m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">return</span> M4x4.translate3(k, k, k, m, r);
+};
+<span class="hljs-comment">/*
+ * Function: M4x4.translateSelf
+ */</span>
+M4x4.translateSelf = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translateSelf</span> <span class="hljs-params">(v, m)</span> {</span>
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    <span class="hljs-keyword">var</span> x=v[<span class="hljs-number">0</span>], y=v[<span class="hljs-number">1</span>], z=v[<span class="hljs-number">2</span>];
+    m[<span class="hljs-number">12</span>] += m[<span class="hljs-number">0</span>] * x + m[<span class="hljs-number">4</span>] * y + m[<span class="hljs-number">8</span>] * z;
+    m[<span class="hljs-number">13</span>] += m[<span class="hljs-number">1</span>] * x + m[<span class="hljs-number">5</span>] * y + m[<span class="hljs-number">9</span>] * z;
+    m[<span class="hljs-number">14</span>] += m[<span class="hljs-number">2</span>] * x + m[<span class="hljs-number">6</span>] * y + m[<span class="hljs-number">10</span>] * z;
+    m[<span class="hljs-number">15</span>] += m[<span class="hljs-number">3</span>] * x + m[<span class="hljs-number">7</span>] * y + m[<span class="hljs-number">11</span>] * z;
+    <span class="hljs-keyword">return</span> m;
+};
+<span class="hljs-comment">/*
+ * Function: M4x4.translate
+ */</span>
+M4x4.translate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translate</span> <span class="hljs-params">(v, m, r)</span> {</span>
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    <span class="hljs-keyword">var</span> x=v[<span class="hljs-number">0</span>], y=v[<span class="hljs-number">1</span>], z=v[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">if</span> (r == m) {
+        m[<span class="hljs-number">12</span>] += m[<span class="hljs-number">0</span>] * x + m[<span class="hljs-number">4</span>] * y + m[<span class="hljs-number">8</span>] * z;
+        m[<span class="hljs-number">13</span>] += m[<span class="hljs-number">1</span>] * x + m[<span class="hljs-number">5</span>] * y + m[<span class="hljs-number">9</span>] * z;
+        m[<span class="hljs-number">14</span>] += m[<span class="hljs-number">2</span>] * x + m[<span class="hljs-number">6</span>] * y + m[<span class="hljs-number">10</span>] * z;
+        m[<span class="hljs-number">15</span>] += m[<span class="hljs-number">3</span>] * x + m[<span class="hljs-number">7</span>] * y + m[<span class="hljs-number">11</span>] * z;
+        <span class="hljs-keyword">return</span> m;
+    }
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    <span class="hljs-keyword">var</span> m11 = m[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">var</span> m21 = m[<span class="hljs-number">1</span>];
+    <span class="hljs-keyword">var</span> m31 = m[<span class="hljs-number">2</span>];
+    <span class="hljs-keyword">var</span> m41 = m[<span class="hljs-number">3</span>];
+    <span class="hljs-keyword">var</span> m12 = m[<span class="hljs-number">4</span>];
+    <span class="hljs-keyword">var</span> m22 = m[<span class="hljs-number">5</span>];
+    <span class="hljs-keyword">var</span> m32 = m[<span class="hljs-number">6</span>];
+    <span class="hljs-keyword">var</span> m42 = m[<span class="hljs-number">7</span>];
+    <span class="hljs-keyword">var</span> m13 = m[<span class="hljs-number">8</span>];
+    <span class="hljs-keyword">var</span> m23 = m[<span class="hljs-number">9</span>];
+    <span class="hljs-keyword">var</span> m33 = m[<span class="hljs-number">10</span>];
+    <span class="hljs-keyword">var</span> m43 = m[<span class="hljs-number">11</span>];
+
+    r[<span class="hljs-number">0</span>] = m11;
+    r[<span class="hljs-number">1</span>] = m21;
+    r[<span class="hljs-number">2</span>] = m31;
+    r[<span class="hljs-number">3</span>] = m41;
+    r[<span class="hljs-number">4</span>] = m12;
+    r[<span class="hljs-number">5</span>] = m22;
+    r[<span class="hljs-number">6</span>] = m32;
+    r[<span class="hljs-number">7</span>] = m42;
+    r[<span class="hljs-number">8</span>] = m13;
+    r[<span class="hljs-number">9</span>] = m23;
+    r[<span class="hljs-number">10</span>] = m33;
+    r[<span class="hljs-number">11</span>] = m43;
+    r[<span class="hljs-number">12</span>] = m11 * x + m12 * y + m13 * z + m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">13</span>] = m21 * x + m22 * y + m23 * z + m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">14</span>] = m31 * x + m32 * y + m33 * z + m[<span class="hljs-number">14</span>];
+    r[<span class="hljs-number">15</span>] = m41 * x + m42 * y + m43 * z + m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.makeLookAt
+ */</span>
+M4x4.makeLookAt = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeLookAt</span> <span class="hljs-params">(eye, center, up, r)</span> {</span>
+    MathUtils_assert(eye.length == <span class="hljs-number">3</span>, <span class="hljs-string">"eye.length == 3"</span>);
+    MathUtils_assert(center.length == <span class="hljs-number">3</span>, <span class="hljs-string">"center.length == 3"</span>);
+    MathUtils_assert(up.length == <span class="hljs-number">3</span>, <span class="hljs-string">"up.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">var</span> z = V3.direction(eye, center, V3._temp1);
+    <span class="hljs-keyword">var</span> x = V3.normalize(V3.cross(up, z, V3._temp2), V3._temp2);
+    <span class="hljs-keyword">var</span> y = V3.normalize(V3.cross(z, x, V3._temp3), V3._temp3);
+
+    <span class="hljs-keyword">var</span> tm1 = M4x4._temp1;
+    <span class="hljs-keyword">var</span> tm2 = M4x4._temp2;
+
+    tm1[<span class="hljs-number">0</span>] = x[<span class="hljs-number">0</span>];
+    tm1[<span class="hljs-number">1</span>] = y[<span class="hljs-number">0</span>];
+    tm1[<span class="hljs-number">2</span>] = z[<span class="hljs-number">0</span>];
+    tm1[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    tm1[<span class="hljs-number">4</span>] = x[<span class="hljs-number">1</span>];
+    tm1[<span class="hljs-number">5</span>] = y[<span class="hljs-number">1</span>];
+    tm1[<span class="hljs-number">6</span>] = z[<span class="hljs-number">1</span>];
+    tm1[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    tm1[<span class="hljs-number">8</span>] = x[<span class="hljs-number">2</span>];
+    tm1[<span class="hljs-number">9</span>] = y[<span class="hljs-number">2</span>];
+    tm1[<span class="hljs-number">10</span>] = z[<span class="hljs-number">2</span>];
+    tm1[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    tm1[<span class="hljs-number">12</span>] = <span class="hljs-number">0</span>;
+    tm1[<span class="hljs-number">13</span>] = <span class="hljs-number">0</span>;
+    tm1[<span class="hljs-number">14</span>] = <span class="hljs-number">0</span>;
+    tm1[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    tm2[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>; tm2[<span class="hljs-number">1</span>] = <span class="hljs-number">0</span>; tm2[<span class="hljs-number">2</span>] = <span class="hljs-number">0</span>; tm2[<span class="hljs-number">3</span>] = <span class="hljs-number">0</span>;
+    tm2[<span class="hljs-number">4</span>] = <span class="hljs-number">0</span>; tm2[<span class="hljs-number">5</span>] = <span class="hljs-number">1</span>; tm2[<span class="hljs-number">6</span>] = <span class="hljs-number">0</span>; tm2[<span class="hljs-number">7</span>] = <span class="hljs-number">0</span>;
+    tm2[<span class="hljs-number">8</span>] = <span class="hljs-number">0</span>; tm2[<span class="hljs-number">9</span>] = <span class="hljs-number">0</span>; tm2[<span class="hljs-number">10</span>] = <span class="hljs-number">1</span>; tm2[<span class="hljs-number">11</span>] = <span class="hljs-number">0</span>;
+    tm2[<span class="hljs-number">12</span>] = -eye[<span class="hljs-number">0</span>]; tm2[<span class="hljs-number">13</span>] = -eye[<span class="hljs-number">1</span>]; tm2[<span class="hljs-number">14</span>] = -eye[<span class="hljs-number">2</span>]; tm2[<span class="hljs-number">15</span>] = <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+    <span class="hljs-keyword">return</span> M4x4.mul(tm1, tm2, r);
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.transposeSelf
+ */</span>
+M4x4.transposeSelf = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transposeSelf</span> <span class="hljs-params">(m)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    <span class="hljs-keyword">var</span> tmp = m[<span class="hljs-number">1</span>]; m[<span class="hljs-number">1</span>] = m[<span class="hljs-number">4</span>]; m[<span class="hljs-number">4</span>] = tmp;
+    tmp = m[<span class="hljs-number">2</span>]; m[<span class="hljs-number">2</span>] = m[<span class="hljs-number">8</span>]; m[<span class="hljs-number">8</span>] = tmp;
+    tmp = m[<span class="hljs-number">3</span>]; m[<span class="hljs-number">3</span>] = m[<span class="hljs-number">12</span>]; m[<span class="hljs-number">12</span>] = tmp;
+    tmp = m[<span class="hljs-number">6</span>]; m[<span class="hljs-number">6</span>] = m[<span class="hljs-number">9</span>]; m[<span class="hljs-number">9</span>] = tmp;
+    tmp = m[<span class="hljs-number">7</span>]; m[<span class="hljs-number">7</span>] = m[<span class="hljs-number">13</span>]; m[<span class="hljs-number">13</span>] = tmp;
+    tmp = m[<span class="hljs-number">11</span>]; m[<span class="hljs-number">11</span>] = m[<span class="hljs-number">14</span>]; m[<span class="hljs-number">14</span>] = tmp;
+    <span class="hljs-keyword">return</span> m;
+};
+<span class="hljs-comment">/*
+ * Function: M4x4.transpose
+ */</span>
+M4x4.transpose = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transpose</span> <span class="hljs-params">(m, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+
+    <span class="hljs-keyword">if</span> (m == r) {
+        <span class="hljs-keyword">var</span> tmp = <span class="hljs-number">0.0</span>;
+        tmp = m[<span class="hljs-number">1</span>]; m[<span class="hljs-number">1</span>] = m[<span class="hljs-number">4</span>]; m[<span class="hljs-number">4</span>] = tmp;
+        tmp = m[<span class="hljs-number">2</span>]; m[<span class="hljs-number">2</span>] = m[<span class="hljs-number">8</span>]; m[<span class="hljs-number">8</span>] = tmp;
+        tmp = m[<span class="hljs-number">3</span>]; m[<span class="hljs-number">3</span>] = m[<span class="hljs-number">12</span>]; m[<span class="hljs-number">12</span>] = tmp;
+        tmp = m[<span class="hljs-number">6</span>]; m[<span class="hljs-number">6</span>] = m[<span class="hljs-number">9</span>]; m[<span class="hljs-number">9</span>] = tmp;
+        tmp = m[<span class="hljs-number">7</span>]; m[<span class="hljs-number">7</span>] = m[<span class="hljs-number">13</span>]; m[<span class="hljs-number">13</span>] = tmp;
+        tmp = m[<span class="hljs-number">11</span>]; m[<span class="hljs-number">11</span>] = m[<span class="hljs-number">14</span>]; m[<span class="hljs-number">14</span>] = tmp;
+        <span class="hljs-keyword">return</span> m;
+    }
+
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
+
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>]; r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">4</span>]; r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">8</span>]; r[<span class="hljs-number">3</span>] = m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">4</span>] = m[<span class="hljs-number">1</span>]; r[<span class="hljs-number">5</span>] = m[<span class="hljs-number">5</span>]; r[<span class="hljs-number">6</span>] = m[<span class="hljs-number">9</span>]; r[<span class="hljs-number">7</span>] = m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">8</span>] = m[<span class="hljs-number">2</span>]; r[<span class="hljs-number">9</span>] = m[<span class="hljs-number">6</span>]; r[<span class="hljs-number">10</span>] = m[<span class="hljs-number">10</span>]; r[<span class="hljs-number">11</span>] = m[<span class="hljs-number">14</span>];
+    r[<span class="hljs-number">12</span>] = m[<span class="hljs-number">3</span>]; r[<span class="hljs-number">13</span>] = m[<span class="hljs-number">7</span>]; r[<span class="hljs-number">14</span>] = m[<span class="hljs-number">11</span>]; r[<span class="hljs-number">15</span>] = m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+
+<span class="hljs-comment">/*
+ * Function: M4x4.transformPoint
+ */</span>
+M4x4.transformPoint = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transformPoint</span> <span class="hljs-params">(m, v, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+
+    <span class="hljs-keyword">var</span> v0 = v[<span class="hljs-number">0</span>], v1 = v[<span class="hljs-number">1</span>], v2 = v[<span class="hljs-number">2</span>];
+
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * v0 + m[<span class="hljs-number">4</span>] * v1 + m[<span class="hljs-number">8</span>] * v2 + m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * v0 + m[<span class="hljs-number">5</span>] * v1 + m[<span class="hljs-number">9</span>] * v2 + m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * v0 + m[<span class="hljs-number">6</span>] * v1 + m[<span class="hljs-number">10</span>] * v2 + m[<span class="hljs-number">14</span>];
+    <span class="hljs-keyword">var</span> w = m[<span class="hljs-number">3</span>] * v0 + m[<span class="hljs-number">7</span>] * v1 + m[<span class="hljs-number">11</span>] * v2 + m[<span class="hljs-number">15</span>];
+
+    <span class="hljs-keyword">if</span> (w != <span class="hljs-number">1.0</span>) {
+        r[<span class="hljs-number">0</span>] /= w;
+        r[<span class="hljs-number">1</span>] /= w;
+        r[<span class="hljs-number">2</span>] /= w;
+    }
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.transformLine
+ */</span>
+M4x4.transformLine = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transformLine</span><span class="hljs-params">(m, v, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+
+    <span class="hljs-keyword">var</span> v0 = v[<span class="hljs-number">0</span>], v1 = v[<span class="hljs-number">1</span>], v2 = v[<span class="hljs-number">2</span>];
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * v0 + m[<span class="hljs-number">4</span>] * v1 + m[<span class="hljs-number">8</span>] * v2;
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * v0 + m[<span class="hljs-number">5</span>] * v1 + m[<span class="hljs-number">9</span>] * v2;
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * v0 + m[<span class="hljs-number">6</span>] * v1 + m[<span class="hljs-number">10</span>] * v2;
+    <span class="hljs-keyword">var</span> w = m[<span class="hljs-number">3</span>] * v0 + m[<span class="hljs-number">7</span>] * v1 + m[<span class="hljs-number">11</span>] * v2;
+
+    <span class="hljs-keyword">if</span> (w != <span class="hljs-number">1.0</span>) {
+        r[<span class="hljs-number">0</span>] /= w;
+        r[<span class="hljs-number">1</span>] /= w;
+        r[<span class="hljs-number">2</span>] /= w;
+    }
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+
+<span class="hljs-comment">/*
+ * Function: M4x4.transformPointAffine
+ */</span>
+M4x4.transformPointAffine = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transformPointAffine</span> <span class="hljs-params">(m, v, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+
+    <span class="hljs-keyword">var</span> v0 = v[<span class="hljs-number">0</span>], v1 = v[<span class="hljs-number">1</span>], v2 = v[<span class="hljs-number">2</span>];
+
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * v0 + m[<span class="hljs-number">4</span>] * v1 + m[<span class="hljs-number">8</span>] * v2 + m[<span class="hljs-number">12</span>];
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * v0 + m[<span class="hljs-number">5</span>] * v1 + m[<span class="hljs-number">9</span>] * v2 + m[<span class="hljs-number">13</span>];
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * v0 + m[<span class="hljs-number">6</span>] * v1 + m[<span class="hljs-number">10</span>] * v2 + m[<span class="hljs-number">14</span>];
+
+    <span class="hljs-keyword">return</span> r;
+};
+
+<span class="hljs-comment">/*
+ * Function: M4x4.transformLineAffine
+ */</span>
+M4x4.transformLineAffine = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transformLineAffine</span><span class="hljs-params">(m, v, r)</span> {</span>
+    MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
+    <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
+        r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
+
+    <span class="hljs-keyword">var</span> v0 = v[<span class="hljs-number">0</span>], v1 = v[<span class="hljs-number">1</span>], v2 = v[<span class="hljs-number">2</span>];
+    r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>] * v0 + m[<span class="hljs-number">4</span>] * v1 + m[<span class="hljs-number">8</span>] * v2;
+    r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>] * v0 + m[<span class="hljs-number">5</span>] * v1 + m[<span class="hljs-number">9</span>] * v2;
+    r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>] * v0 + m[<span class="hljs-number">6</span>] * v1 + m[<span class="hljs-number">10</span>] * v2;
+
+    <span class="hljs-keyword">return</span> r;
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>for AMD shimming:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> mjs = {
+  FLOAT_ARRAY_TYPE: MJS_FLOAT_ARRAY_TYPE,
+  V3: V3,
+  M4x4: M4x4
+};
+
+<span class="hljs-keyword">return</span> mjs;
+});</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
