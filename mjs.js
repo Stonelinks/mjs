@@ -1,8 +1,9 @@
 /* -*- Mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40; -*- */
-/*
+/* 
  * Copyright (c) 2010 Mozilla Corporation
  * Copyright (c) 2010 Vladimir Vukicevic
- *
+ * Modified 2014 Lucas Doyle
+ * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -11,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -23,52 +24,46 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
- */
+*/
 
-/*
- * File: mjs
- *
- * Vector and Matrix math utilities for JavaScript, optimized for WebGL.
- */
+// 
+// #mjs
+//
+// Vector and Matrix math utilities for JavaScript, optimized for WebGL.
+//
 
+// amd support
 define([], function() {
 
-/*
- * Constant: MJS_VERSION
- *
- * mjs version number aa.bb.cc, encoded as an integer of the form:
- * 0xaabbcc.
- */
+// 
+// ##Constant: MJS_VERSION
+//
+// mjs version number aa.bb.cc, encoded as an integer of the form:
+// 0xaabbcc.
+//
 const MJS_VERSION = 0x000000;
 
-/*
- * Constant: MJS_DO_ASSERT
- *
- * Enables or disables runtime assertions.
- *
- * For potentially more performance, the assert methods can be
- * commented out in each place where they are called.
- */
+// 
+// ##Constant: MJS_DO_ASSERT
+//
+// Enables or disables runtime assertions.
+//
+// For potentially more performance, the assert methods can be
+// commented out in each place where they are called.
+//
 const MJS_DO_ASSERT = true;
 
-// Some hacks for running in both the shell and browser,
-// and for supporting F32 and WebGLFloat arrays
-// try { WebGLFloatArray  undefined; } catch (x) { WebGLFloatArray = Float32Array; }
-
-/*
- * Constant: MJS_FLOAT_ARRAY_TYPE
- *
- * The base float array type.  By default, WebGLFloatArray.
- *
- * mjs can work with any array-like elements, but if an array
- * creation is requested, it will create an array of the type
- * MJS_FLOAT_ARRAY_TYPE.  Also, the builtin constants such as (M4x4.I)
- * will be of this type.
- */
-// const MJS_FLOAT_ARRAY_TYPE = WebGLFloatArray;
-// const MJS_FLOAT_ARRAY_TYPE = Float32Array;
+// 
+// ##Constant: MJS_FLOAT_ARRAY_TYPE
+//
+// The base float array type.  By default, WebGLFloatArray.
+//
+// mjs can work with any array-like elements, but if an array
+// creation is requested, it will create an array of the type
+// MJS_FLOAT_ARRAY_TYPE.  Also, the builtin constants such as (M4x4.I)
+// will be of this type.
+//
 const MJS_FLOAT_ARRAY_TYPE = Float64Array;
-//const MJS_FLOAT_ARRAY_TYPE = Array;
 
 if (MJS_DO_ASSERT) {
 function MathUtils_assert(cond, msg) {
@@ -79,13 +74,13 @@ function MathUtils_assert(cond, msg) {
 function MathUtils_assert() { }
 }
 
-/*
- * Class: V3
- *
- * Methods for working with 3-element vectors.  A vector is represented by a 3-element array.
- * Any valid JavaScript array type may be used, but if new
- * vectors are created they are created using the configured MJS_FLOAT_ARRAY_TYPE.
- */
+// 
+// #Class V3
+//
+// Methods for working with 3-element vectors.  A vector is represented by a 3-element array.
+// Any valid JavaScript array type may be used, but if new
+// vectors are created they are created using the configured MJS_FLOAT_ARRAY_TYPE.
+//
 
 var V3 = { };
 
@@ -111,37 +106,37 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
     V3.y = new MJS_FLOAT_ARRAY_TYPE([0.0, 1.0, 0.0]);
     V3.z = new MJS_FLOAT_ARRAY_TYPE([0.0, 0.0, 1.0]);
 
-/*
- * Function: V3.$
- *
- * Creates a new 3-element vector with the given values.
- *
- * Parameters:
- *
- *   x,y,z - the 3 elements of the new vector.
- *
- * Returns:
- *
- * A new vector containing with the given argument values.
- */
+// 
+// ##Function: V3.$
+//
+// Creates a new 3-element vector with the given values.
+//
+// **Parameters:**
+//
+//   - **x, y, z** - the 3 elements of the new vector.
+//
+// **Returns:**
+//
+// A new vector containing with the given argument values.
+//
 
     V3.$ = function V3_$(x, y, z) {
         return new MJS_FLOAT_ARRAY_TYPE([x, y, z]);
     };
 
-/*
- * Function: V3.clone
- *
- * Clone the given 3-element vector.
- *
- * Parameters:
- *
- *   a - the 3-element vector to clone
- *
- * Returns:
- *
- * A new vector with the same values as the passed-in one.
- */
+// 
+// ##Function: V3.clone
+//
+// Clone the given 3-element vector.
+//
+// **Parameters:**
+//
+//   - **a** - the 3-element vector to clone
+//
+// **Returns:**
+//
+// A new vector with the same values as the passed-in one.
+//
 
     V3.clone = function V3_clone(a) {
         MathUtils_assert(a.length == 3, "a.length == 3");
@@ -152,22 +147,22 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
 V3.u = V3.x;
 V3.v = V3.y;
 
-/*
- * Function: V3.add
- *
- * Perform r = a + b.
- *
- * Parameters:
- *
- *   a - the first vector operand
- *   b - the second vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.add
+//
+// Perform r = a + b.
+//
+// **Parameters:**
+//
+//   - **a** - the first vector operand
+//   - **b** - the second vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.add = function V3_add(a, b, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
@@ -181,23 +176,23 @@ V3.add = function V3_add(a, b, r) {
     return r;
 };
 
-/*
- * Function: V3.sub
- *
- * Perform
- * r = a - b.
- *
- * Parameters:
- *
- *   a - the first vector operand
- *   b - the second vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.sub
+//
+// Perform
+// r = a - b.
+//
+// **Parameters:**
+//
+//   - **a** - the first vector operand
+//   - **b** - the second vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.sub = function V3_sub(a, b, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
@@ -211,22 +206,22 @@ V3.sub = function V3_sub(a, b, r) {
     return r;
 };
 
-/*
- * Function: V3.neg
- *
- * Perform
- * r = - a.
- *
- * Parameters:
- *
- *   a - the vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.neg
+//
+// Perform
+// r = - a.
+//
+// **Parameters:**
+//
+//   - **a** - the vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.neg = function V3_neg(a, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
@@ -239,24 +234,24 @@ V3.neg = function V3_neg(a, r) {
     return r;
 };
 
-/*
- * Function: V3.direction
- *
- * Perform
- * r = (a - b) / |a - b|.  The result is the normalized
- * direction from a to b.
- *
- * Parameters:
- *
- *   a - the first vector operand
- *   b - the second vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.direction
+//
+// Perform
+// r = (a - b) / |a - b|.  The result is the normalized
+// direction from a to b.
+//
+// **Parameters:**
+//
+//   - **a** - the first vector operand
+//   - **b** - the second vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.direction = function V3_direction(a, b, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
@@ -267,59 +262,59 @@ V3.direction = function V3_direction(a, b, r) {
     return V3.normalize(V3.sub(a, b, r), r);
 };
 
-/*
- * Function: V3.length
- *
- * Perform r = |a|.
- *
- * Parameters:
- *
- *   a - the vector operand
- *
- * Returns:
- *
- *   The length of the given vector.
- */
+// 
+// ##Function: V3.length
+//
+// Perform r = |a|.
+//
+// **Parameters:**
+//
+//   - **a** - the vector operand
+//
+// **Returns:**
+//
+//   The length of the given vector.
+//
 V3.length = function V3_length(a) {
     MathUtils_assert(a.length == 3, "a.length == 3");
 
     return Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
 };
 
-/*
- * Function: V3.lengthSquard
- *
- * Perform r = |a|*|a|.
- *
- * Parameters:
- *
- *   a - the vector operand
- *
- * Returns:
- *
- *   The square of the length of the given vector.
- */
+// 
+// ##Function: V3.lengthSquard
+//
+// Perform r = |a|*|a|.
+//
+// **Parameters:**
+//
+//   - **a** - the vector operand
+//
+// **Returns:**
+//
+//   The square of the length of the given vector.
+//
 V3.lengthSquared = function V3_lengthSquared(a) {
     MathUtils_assert(a.length == 3, "a.length == 3");
 
     return a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
 };
 
-/*
- * Function: V3.normalize
- *
- * Perform r = a / |a|.
- *
- * Parameters:
- *
- *   a - the vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.normalize
+//
+// Perform r = a / |a|.
+//
+// **Parameters:**
+//
+//   - **a** - the vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.normalize = function V3_normalize(a, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
@@ -333,22 +328,22 @@ V3.normalize = function V3_normalize(a, r) {
     return r;
 };
 
-/*
- * Function: V3.scale
- *
- * Perform r = a * k.
- *
- * Parameters:
- *
- *   a - the vector operand
- *   k - a scalar value
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.scale
+//
+// Perform r = a * k.
+//
+// **Parameters:**
+//
+//   - **a** - the vector operand
+//   - **k** - a scalar value
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.scale = function V3_scale(a, k, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
@@ -361,21 +356,21 @@ V3.scale = function V3_scale(a, k, r) {
     return r;
 };
 
-/*
- * Function: V3.dot
- *
- * Perform
- * r = dot(a, b).
- *
- * Parameters:
- *
- *   a - the first vector operand
- *   b - the second vector operand
- *
- * Returns:
- *
- *   The dot product of a and b.
- */
+// 
+// ##Function: V3.dot
+//
+// Perform
+// r = dot(a, b).
+//
+// **Parameters:**
+//
+//   - **a** - the first vector operand
+//   - **b** - the second vector operand
+//
+// **Returns:**
+//
+//   The dot product of a and b.
+//
 V3.dot = function V3_dot(a, b) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
@@ -385,22 +380,22 @@ V3.dot = function V3_dot(a, b) {
         a[2] * b[2];
 };
 
-/*
- * Function: V3.cross
- *
- * Perform r = a x b.
- *
- * Parameters:
- *
- *   a - the first vector operand
- *   b - the second vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- */
+// 
+// ##Function: V3.cross
+//
+// Perform r = a x b.
+//
+// **Parameters:**
+//
+//   - **a** - the first vector operand
+//   - **b** - the second vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//
 V3.cross = function V3_cross(a, b, r) {
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
@@ -414,25 +409,25 @@ V3.cross = function V3_cross(a, b, r) {
     return r;
 };
 
-/*
- * Function: V3.mul4x4
- *
- * Perform
- * r = m * v.
- *
- * Parameters:
- *
- *   m - the 4x4 matrix operand
- *   v - the 3-element vector operand
- *   r - optional vector to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3-element vector with the result.
- *   The 4-element result vector is divided by the w component
- *   and returned as a 3-element vector.
- */
+// 
+// ##Function: V3.mul4x4
+//
+// Perform
+// r = m * v.
+//
+// **Parameters:**
+//
+//   - **m** - the 4x4 matrix operand
+//   - **v** - the 3-element vector operand
+//   - **r** - optional vector to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3-element vector with the result.
+//   The 4-element result vector is divided by the w component
+//   and returned as a 3-element vector.
+//
 V3.mul4x4 = function V3_mul4x4(m, v, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
@@ -461,13 +456,13 @@ V3.mul4x4 = function V3_mul4x4(m, v, r) {
     return r;
 };
 
-/*
- * Class: M4x4
- *
- * Methods for working with 4x4 matrices.  A matrix is represented by a 16-element array
- * in column-major order.  Any valid JavaScript array type may be used, but if new
- * matrices are created they are created using the configured MJS_FLOAT_ARRAY_TYPE.
- */
+// 
+// #Class M4x4
+//
+// Methods for working with 4x4 matrices.  A matrix is represented by a 16-element array
+// in column-major order.  Any valid JavaScript array type may be used, but if new
+// matrices are created they are created using the configured MJS_FLOAT_ARRAY_TYPE.
+//
 
 var M4x4 = { };
 
@@ -504,19 +499,19 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
                                    0.0, 0.0, 1.0, 0.0,
                                    0.0, 0.0, 0.0, 1.0]);
 
-/*
- * Function: M4x4.$
- *
- * Creates a new 4x4 matrix with the given values.
- *
- * Parameters:
- *
- *   m00..m15 - the 16 elements of the new matrix.
- *
- * Returns:
- *
- * A new matrix filled with the given argument values.
- */
+// 
+// ##Function: M4x4.$
+//
+// Creates a new 4x4 matrix with the given values.
+//
+// **Parameters:**
+//
+//   - **m00..m15** - the 16 elements of the new matrix.
+//
+// **Returns:**
+//
+// A new matrix filled with the given argument values.
+//
     M4x4.$ = function M4x4_$(m00, m01, m02, m03,
                              m04, m05, m06, m07,
                              m08, m09, m10, m11,
@@ -528,19 +523,19 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
                                          m12, m13, m14, m15]);
     };
 
-/*
- * Function: M4x4.clone
- *
- * Clone the given 4x4 matrix.
- *
- * Parameters:
- *
- *   m - the 4x4 matrix to clone
- *
- * Returns:
- *
- * A new matrix with the same values as the passed-in one.
- */
+// 
+// ##Function: M4x4.clone
+//
+// Clone the given 4x4 matrix.
+//
+// **Parameters:**
+//
+//   - **m** - the 4x4 matrix to clone
+//
+// **Returns:**
+//
+// A new matrix with the same values as the passed-in one.
+//
     M4x4.clone = function M4x4_clone(m) {
         MathUtils_assert(m.length == 16, "m.length == 16");
         return new MJS_FLOAT_ARRAY_TYPE(m);
@@ -549,21 +544,21 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
 
 M4x4.identity = M4x4.I;
 
-/*
- * Function: M4x4.topLeft3x3
- *
- * Return the top left 3x3 matrix from the given 4x4 matrix m.
- *
- * Parameters:
- *
- *   m - the matrix
- *   r - optional 3x3 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3x3 matrix with the result.
- */
+// 
+// ##Function: M4x4.topLeft3x3
+//
+// Return the top left 3x3 matrix from the given 4x4 matrix m.
+//
+// **Parameters:**
+//
+//   - **m** - the matrix
+//   - **r** - optional 3x3 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3x3 matrix with the result.
+//
 M4x4.topLeft3x3 = function M4x4_topLeft3x3(m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 9, "r == undefined || r.length == 9");
@@ -576,22 +571,22 @@ M4x4.topLeft3x3 = function M4x4_topLeft3x3(m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.inverseOrthonormal
- *
- * Computes the inverse of the given matrix m, assuming that
- * the matrix is orthonormal.
- *
- * Parameters:
- *
- *   m - the matrix
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.inverseOrthonormal
+//
+// Computes the inverse of the given matrix m, assuming that
+// the matrix is orthonormal.
+//
+// **Parameters:**
+//
+//   - **m** - the matrix
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.inverseOrthonormal = function M4x4_inverseOrthonormal(m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -608,22 +603,22 @@ M4x4.inverseOrthonormal = function M4x4_inverseOrthonormal(m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.inverseTo3x3
- *
- * Computes the inverse of the given matrix m, but calculates
- * only the top left 3x3 values of the result.
- *
- * Parameters:
- *
- *   m - the matrix
- *   r - optional 3x3 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 3x3 matrix with the result.
- */
+// 
+// ##Function: M4x4.inverseTo3x3
+//
+// Computes the inverse of the given matrix m, but calculates
+// only the top left 3x3 values of the result.
+//
+// **Parameters:**
+//
+//   - **m** - the matrix
+//   - **r** - optional 3x3 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 3x3 matrix with the result.
+//
 M4x4.inverseTo3x3 = function M4x4_inverseTo3x3(m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 9, "r == undefined || r.length == 9");
@@ -658,26 +653,26 @@ M4x4.inverseTo3x3 = function M4x4_inverseTo3x3(m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.makeFrustum
- *
- * Creates a matrix for a projection frustum with the given parameters.
- *
- * Parameters:
- *
- *   left - the left coordinate of the frustum
- *   right- the right coordinate of the frustum
- *   bottom - the bottom coordinate of the frustum
- *   top - the top coordinate of the frustum
- *   znear - the near z distance of the frustum
- *   zfar - the far z distance of the frustum
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the projection matrix.
- *   Otherwise, returns a new 4x4 matrix.
- */
+// 
+// ##Function: M4x4.makeFrustum
+//
+// Creates a matrix for a projection frustum with the given parameters.
+//
+// **Parameters:**
+//
+//   - **left** - the left coordinate of the frustum
+//   - **right** - the right coordinate of the frustum
+//   - **bottom** - the bottom coordinate of the frustum
+//   - **top** - the top coordinate of the frustum
+//   - **znear** - the near z distance of the frustum
+//   - **zfar** - the far z distance of the frustum
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the projection matrix.
+//   Otherwise, returns a new 4x4 matrix.
+//
 M4x4.makeFrustum = function M4x4_makeFrustum(left, right, bottom, top, znear, zfar, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
@@ -711,24 +706,24 @@ M4x4.makeFrustum = function M4x4_makeFrustum(left, right, bottom, top, znear, zf
     return r;
 };
 
-/*
- * Function: M4x4.makePerspective
- *
- * Creates a matrix for a perspective projection with the given parameters.
- *
- * Parameters:
- *
- *   fovy - field of view in the y axis, in degrees
- *   aspect - aspect ratio
- *   znear - the near z distance of the projection
- *   zfar - the far z distance of the projection
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the projection matrix.
- *   Otherwise, returns a new 4x4 matrix.
- */
+// 
+// ##Function: M4x4.makePerspective
+//
+// Creates a matrix for a perspective projection with the given parameters.
+//
+// **Parameters:**
+//
+//   - **fovy** - field of view in the y axis, in degrees
+//   - **aspect** - aspect ratio
+//   - **znear** - the near z distance of the projection
+//   - **zfar** - the far z distance of the projection
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the projection matrix.
+//   Otherwise, returns a new 4x4 matrix.
+//
 M4x4.makePerspective = function M4x4_makePerspective (fovy, aspect, znear, zfar, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
@@ -740,26 +735,26 @@ M4x4.makePerspective = function M4x4_makePerspective (fovy, aspect, znear, zfar,
     return M4x4.makeFrustum(xmin, xmax, ymin, ymax, znear, zfar, r);
 };
 
-/*
- * Function: M4x4.makeOrtho
- *
- * Creates a matrix for an orthogonal frustum projection with the given parameters.
- *
- * Parameters:
- *
- *   left - the left coordinate of the frustum
- *   right- the right coordinate of the frustum
- *   bottom - the bottom coordinate of the frustum
- *   top - the top coordinate of the frustum
- *   znear - the near z distance of the frustum
- *   zfar - the far z distance of the frustum
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the projection matrix.
- *   Otherwise, returns a new 4x4 matrix.
- */
+// 
+// ##Function: M4x4.makeOrtho
+//
+// Creates a matrix for an orthogonal frustum projection with the given parameters.
+//
+// **Parameters:**
+//
+//   - **left** - the left coordinate of the frustum
+//   - **right** - the right coordinate of the frustum
+//   - **bottom** - the bottom coordinate of the frustum
+//   - **top** - the top coordinate of the frustum
+//   - **znear** - the near z distance of the frustum
+//   - **zfar** - the far z distance of the frustum
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the projection matrix.
+//   Otherwise, returns a new 4x4 matrix.
+//
 M4x4.makeOrtho = function M4x4_makeOrtho (left, right, bottom, top, znear, zfar, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
@@ -793,47 +788,47 @@ M4x4.makeOrtho = function M4x4_makeOrtho (left, right, bottom, top, znear, zfar,
     return r;
 };
 
-/*
- * Function: M4x4.makeOrtho
- *
- * Creates a matrix for a 2D orthogonal frustum projection with the given parameters.
- * znear and zfar are assumed to be -1 and 1, respectively.
- *
- * Parameters:
- *
- *   left - the left coordinate of the frustum
- *   right- the right coordinate of the frustum
- *   bottom - the bottom coordinate of the frustum
- *   top - the top coordinate of the frustum
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the projection matrix.
- *   Otherwise, returns a new 4x4 matrix.
- */
+// 
+// ##Function: M4x4.makeOrtho
+//
+// Creates a matrix for a 2D orthogonal frustum projection with the given parameters.
+// znear and zfar are assumed to be -1 and 1, respectively.
+//
+// **Parameters:**
+//
+//   - **left** - the left coordinate of the frustum
+//   - **right** - the right coordinate of the frustum
+//   - **bottom** - the bottom coordinate of the frustum
+//   - **top** - the top coordinate of the frustum
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the projection matrix.
+//   Otherwise, returns a new 4x4 matrix.
+//
 M4x4.makeOrtho2D = function M4x4_makeOrtho2D (left, right, bottom, top, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
     return M4x4.makeOrtho(left, right, bottom, top, -1, 1, r);
 };
 
-/*
- * Function: M4x4.mul
- *
- * Performs r = a * b.
- *
- * Parameters:
- *
- *   a - the first matrix operand
- *   b - the second matrix operand
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.mul
+//
+// Performs r = a * b.
+//
+// **Parameters:**
+//
+//   - **a** - the first matrix operand
+//   - **b** - the second matrix operand
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.mul = function M4x4_mul(a, b, r) {
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
@@ -897,22 +892,22 @@ M4x4.mul = function M4x4_mul(a, b, r) {
     return r;
 };
 
-/*
- * Function: M4x4.mulOffset
- *
- * Performs r' = a * b, where r' is the 16 elements of r starting at element o.
- *
- * Parameters:
- *
- *   a - the first matrix operand
- *   b - the second matrix operand
- *   r - array to store the result in
- *   o - offset into r at which to start storing results
- *
- * Returns:
- *
- *   r
- */
+// 
+// ##Function: M4x4.mulOffset
+//
+// Performs r' = a * b, where r' is the 16 elements of r starting at element o.
+//
+// **Parameters:**
+//
+//   - **a** - the first matrix operand
+//   - **b** - the second matrix operand
+//   - **r** - array to store the result in
+//   - **o** - offset into r at which to start storing results
+//
+// **Returns:**
+//
+//   r
+//
 M4x4.mulOffset = function M4x4_mulOffset(a, b, r, o) {
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
@@ -970,22 +965,22 @@ M4x4.mulOffset = function M4x4_mulOffset(a, b, r, o) {
     return r;
 };
 
-/*
- * Function: M4x4.mulAffine
- *
- * Performs r = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1)
- *
- * Parameters:
- *
- *   a - the first matrix operand
- *   b - the second matrix operand
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.mulAffine
+//
+// Performs r = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1)
+//
+// **Parameters:**
+//
+//   - **a** - the first matrix operand
+//   - **b** - the second matrix operand
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.mulAffine = function M4x4_mulAffine(a, b, r) {
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
@@ -1040,22 +1035,22 @@ M4x4.mulAffine = function M4x4_mulAffine(a, b, r) {
     return r;
 };
 
-/*
- * Function: M4x4.mulAffineOffset
- *
- * Performs r' = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1), where r' is the 16 elements of r starting at element o
- *
- * Parameters:
- *
- *   a - the first matrix operand
- *   b - the second matrix operand
- *   r - array to store the result in
- *   o - offset into r at which to start storing results
- *
- * Returns:
- *
- *   r
- */
+// 
+// ##Function: M4x4.mulAffineOffset
+//
+// Performs r' = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1), where r' is the 16 elements of r starting at element o
+//
+// **Parameters:**
+//
+//   - **a** - the first matrix operand
+//   - **b** - the second matrix operand
+//   - **r** - array to store the result in
+//   - **o** - offset into r at which to start storing results
+//
+// **Returns:**
+//
+//   r
+//
 M4x4.mulAffine = function M4x4_mulAffine(a, b, r, o) {
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
@@ -1108,22 +1103,22 @@ M4x4.mulAffine = function M4x4_mulAffine(a, b, r, o) {
     return r;
 };
 
-/*
- * Function: M4x4.makeRotate
- *
- * Creates a transformation matrix for rotation by angle radians about the 3-element vector axis.
- *
- * Parameters:
- *
- *   angle - the angle of rotation, in radians
- *   axis - the axis around which the rotation is performed, a 3-element vector
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the matrix.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.makeRotate
+//
+// Creates a transformation matrix for rotation by angle radians about the 3-element vector axis.
+//
+// **Parameters:**
+//
+//   - **angle** - the angle of rotation, in radians
+//   - **axis** - the axis around which the rotation is performed, a 3-element vector
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the matrix.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
     MathUtils_assert(angle.length == 3, "angle.length == 3");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
@@ -1158,23 +1153,23 @@ M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
     return r;
 };
 
-/*
- * Function: M4x4.rotate
- *
- * Concatenates a rotation of angle radians about the axis to the give matrix m.
- *
- * Parameters:
- *
- *   angle - the angle of rotation, in radians
- *   axis - the axis around which the rotation is performed, a 3-element vector
- *   m - the matrix to concatenate the rotation to
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after performing the operation.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.rotate
+//
+// Concatenates a rotation of angle radians about the axis to the give matrix m.
+//
+// **Parameters:**
+//
+//   - **angle** - the angle of rotation, in radians
+//   - **axis** - the axis around which the rotation is performed, a 3-element vector
+//   - **m** - the matrix to concatenate the rotation to
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after performing the operation.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.rotate = function M4x4_rotate(angle, axis, m, r) {
     MathUtils_assert(angle.length == 3, "angle.length == 3");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
@@ -1246,24 +1241,24 @@ M4x4.rotate = function M4x4_rotate(angle, axis, m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.makeScale3
- *
- * Creates a transformation matrix for scaling by 3 scalar values, one for
- * each of the x, y, and z directions.
- *
- * Parameters:
- *
- *   x - the scale for the x axis
- *   y - the scale for the y axis
- *   z - the scale for the z axis
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the matrix.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.makeScale3
+//
+// Creates a transformation matrix for scaling by 3 scalar values, one for
+// each of the x, y, and z directions.
+//
+// **Parameters:**
+//
+//   - **x** - the scale for the x axis
+//   - **y** - the scale for the y axis
+//   - **z** - the scale for the z axis
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the matrix.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.makeScale3 = function M4x4_makeScale3(x, y, z, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
@@ -1290,43 +1285,43 @@ M4x4.makeScale3 = function M4x4_makeScale3(x, y, z, r) {
     return r;
 };
 
-/*
- * Function: M4x4.makeScale1
- *
- * Creates a transformation matrix for a uniform scale by a single scalar value.
- *
- * Parameters:
- *
- *   k - the scale factor
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the matrix.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.makeScale1
+//
+// Creates a transformation matrix for a uniform scale by a single scalar value.
+//
+// **Parameters:**
+//
+//   - **k** - the scale factor
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the matrix.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.makeScale1 = function M4x4_makeScale1(k, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
     return M4x4.makeScale3(k, k, k, r);
 };
 
-/*
- * Function: M4x4.makeScale
- *
- * Creates a transformation matrix for scaling each of the x, y, and z axes by the amount
- * given in the corresponding element of the 3-element vector.
- *
- * Parameters:
- *
- *   v - the 3-element vector containing the scale factors
- *   r - optional 4x4 matrix to store the result in
- *
- * Returns:
- *
- *   If r is specified, returns r after creating the matrix.
- *   Otherwise, returns a new 4x4 matrix with the result.
- */
+// 
+// ##Function: M4x4.makeScale
+//
+// Creates a transformation matrix for scaling each of the x, y, and z axes by the amount
+// given in the corresponding element of the 3-element vector.
+//
+// **Parameters:**
+//
+//   - **v** - the 3-element vector containing the scale factors
+//   - **r** - optional 4x4 matrix to store the result in
+//
+// **Returns:**
+//
+//   If r is specified, returns r after creating the matrix.
+//   Otherwise, returns a new 4x4 matrix with the result.
+//
 M4x4.makeScale = function M4x4_makeScale(v, r) {
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1334,9 +1329,9 @@ M4x4.makeScale = function M4x4_makeScale(v, r) {
     return M4x4.makeScale3(v[0], v[1], v[2], r);
 };
 
-/*
- * Function: M4x4.scale3
- */
+// 
+// ##Function: M4x4.scale3
+//
 M4x4.scale3 = function M4x4_scale3(x, y, z, m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1380,9 +1375,9 @@ M4x4.scale3 = function M4x4_scale3(x, y, z, m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.scale1
- */
+// 
+// ##Function: M4x4.scale1
+//
 M4x4.scale1 = function M4x4_scale1(k, m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1426,9 +1421,9 @@ M4x4.scale1 = function M4x4_scale1(k, m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.scale1
- */
+// 
+// ##Function: M4x4.scale1
+//
 M4x4.scale = function M4x4_scale(v, m, r) {
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
@@ -1475,9 +1470,9 @@ M4x4.scale = function M4x4_scale(v, m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.makeTranslate3
- */
+// 
+// ##Function: M4x4.makeTranslate3
+//
 M4x4.makeTranslate3 = function M4x4_makeTranslate3(x, y, z, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
@@ -1504,18 +1499,18 @@ M4x4.makeTranslate3 = function M4x4_makeTranslate3(x, y, z, r) {
     return r;
 };
 
-/*
- * Function: M4x4.makeTranslate1
- */
+// 
+// ##Function: M4x4.makeTranslate1
+//
 M4x4.makeTranslate1 = function M4x4_makeTranslate1 (k, r) {
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
     return M4x4.makeTranslate3(k, k, k, r);
 };
 
-/*
- * Function: M4x4.makeTranslate
- */
+// 
+// ##Function: M4x4.makeTranslate
+//
 M4x4.makeTranslate = function M4x4_makeTranslate (v, r) {
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1523,9 +1518,9 @@ M4x4.makeTranslate = function M4x4_makeTranslate (v, r) {
     return M4x4.makeTranslate3(v[0], v[1], v[2], r);
 };
 
-/*
- * Function: M4x4.translate3Self
- */
+// 
+// ##Function: M4x4.translate3Self
+//
 M4x4.translate3Self = function M4x4_translate3Self (x, y, z, m) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1536,9 +1531,9 @@ M4x4.translate3Self = function M4x4_translate3Self (x, y, z, m) {
     return m;
 };
 
-/*
- * Function: M4x4.translate3
- */
+// 
+// ##Function: M4x4.translate3
+//
 M4x4.translate3 = function M4x4_translate3 (x, y, z, m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1588,18 +1583,18 @@ M4x4.translate3 = function M4x4_translate3 (x, y, z, m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.translate1
- */
+// 
+// ##Function: M4x4.translate1
+//
 M4x4.translate1 = function M4x4_translate1 (k, m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
 
     return M4x4.translate3(k, k, k, m, r);
 };
-/*
- * Function: M4x4.translateSelf
- */
+// 
+// ##Function: M4x4.translateSelf
+//
 M4x4.translateSelf = function M4x4_translateSelf (v, m) {
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
@@ -1610,9 +1605,9 @@ M4x4.translateSelf = function M4x4_translateSelf (v, m) {
     m[15] += m[3] * x + m[7] * y + m[11] * z;
     return m;
 };
-/*
- * Function: M4x4.translate
- */
+// 
+// ##Function: M4x4.translate
+//
 M4x4.translate = function M4x4_translate (v, m, r) {
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
@@ -1662,9 +1657,9 @@ M4x4.translate = function M4x4_translate (v, m, r) {
     return r;
 };
 
-/*
- * Function: M4x4.makeLookAt
- */
+// 
+// ##Function: M4x4.makeLookAt
+//
 M4x4.makeLookAt = function M4x4_makeLookAt (eye, center, up, r) {
     MathUtils_assert(eye.length == 3, "eye.length == 3");
     MathUtils_assert(center.length == 3, "center.length == 3");
@@ -1705,9 +1700,9 @@ M4x4.makeLookAt = function M4x4_makeLookAt (eye, center, up, r) {
     return M4x4.mul(tm1, tm2, r);
 };
 
-/*
- * Function: M4x4.transposeSelf
- */
+// 
+// ##Function: M4x4.transposeSelf
+//
 M4x4.transposeSelf = function M4x4_transposeSelf (m) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     var tmp = m[1]; m[1] = m[4]; m[4] = tmp;
@@ -1718,9 +1713,9 @@ M4x4.transposeSelf = function M4x4_transposeSelf (m) {
     tmp = m[11]; m[11] = m[14]; m[14] = tmp;
     return m;
 };
-/*
- * Function: M4x4.transpose
- */
+// 
+// ##Function: M4x4.transpose
+//
 M4x4.transpose = function M4x4_transpose (m, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
@@ -1748,9 +1743,9 @@ M4x4.transpose = function M4x4_transpose (m, r) {
 };
 
 
-/*
- * Function: M4x4.transformPoint
- */
+// 
+// ##Function: M4x4.transformPoint
+//
 M4x4.transformPoint = function M4x4_transformPoint (m, v, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
@@ -1774,9 +1769,9 @@ M4x4.transformPoint = function M4x4_transformPoint (m, v, r) {
     return r;
 };
 
-/*
- * Function: M4x4.transformLine
- */
+// 
+// ##Function: M4x4.transformLine
+//
 M4x4.transformLine = function M4x4_transformLine(m, v, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
@@ -1800,9 +1795,9 @@ M4x4.transformLine = function M4x4_transformLine(m, v, r) {
 };
 
 
-/*
- * Function: M4x4.transformPointAffine
- */
+// 
+// ##Function: M4x4.transformPointAffine
+//
 M4x4.transformPointAffine = function M4x4_transformPointAffine (m, v, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
@@ -1819,9 +1814,9 @@ M4x4.transformPointAffine = function M4x4_transformPointAffine (m, v, r) {
     return r;
 };
 
-/*
- * Function: M4x4.transformLineAffine
- */
+// 
+// ##Function: M4x4.transformLineAffine
+//
 M4x4.transformLineAffine = function M4x4_transformLineAffine(m, v, r) {
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
@@ -1837,7 +1832,7 @@ M4x4.transformLineAffine = function M4x4_transformLineAffine(m, v, r) {
     return r;
 };
 
-// for AMD shimming:
+// export public API:
 var mjs = {
   FLOAT_ARRAY_TYPE: MJS_FLOAT_ARRAY_TYPE,
   V3: V3,
