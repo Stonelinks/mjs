@@ -30,12 +30,11 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/* -*- Mode: js2; js2-basic-offset: 4; indent-tabs-mode: nil; tab-width: 40; -*- */</span>
-<span class="hljs-comment">/* 
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/*
  * Copyright (c) 2010 Mozilla Corporation
  * Copyright (c) 2010 Vladimir Vukicevic
- * Modified 2014 Lucas Doyle
- * 
+ * Modifications 2014 Lucas Doyle
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -44,10 +43,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -97,12 +96,11 @@
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <h2 id="constant-mjs_version">Constant: MJS_VERSION</h2>
-<p>mjs version number aa.bb.cc, encoded as an integer of the form:
-0xaabbcc.</p>
+<p>mjs version number aa.bb.cc, encoded as a string</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> MJS_VERSION = <span class="hljs-number">0x000000</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> MJS_VERSION = <span class="hljs-string">'0.0.2'</span>;</pre></div></div>
             
         </li>
         
@@ -112,24 +110,6 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
-              </div>
-              <h2 id="constant-mjs_do_assert">Constant: MJS_DO_ASSERT</h2>
-<p>Enables or disables runtime assertions.</p>
-<p>For potentially more performance, the assert methods can be
-commented out in each place where they are called.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> MJS_DO_ASSERT = <span class="hljs-literal">true</span>;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <h2 id="constant-mjs_float_array_type">Constant: MJS_FLOAT_ARRAY_TYPE</h2>
 <p>The base float array type.  By default, WebGLFloatArray.</p>
@@ -142,23 +122,19 @@ will be of this type.</p>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">const</span> MJS_FLOAT_ARRAY_TYPE = <span class="hljs-built_in">Float64Array</span>;
 
-<span class="hljs-keyword">if</span> (MJS_DO_ASSERT) {
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MathUtils_assert</span><span class="hljs-params">(cond, msg)</span> {</span>
     <span class="hljs-keyword">if</span> (!cond)
         <span class="hljs-keyword">throw</span> <span class="hljs-string">"Assertion failed: "</span> + msg;
-}
-} <span class="hljs-keyword">else</span> {
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MathUtils_assert</span><span class="hljs-params">()</span> {</span> }
 }</pre></div></div>
             
         </li>
         
         
-        <li id="section-7">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <h1 id="class-v3">Class V3</h1>
 <p>Methods for working with 3-element vectors.  A vector is represented by a 3-element array.
@@ -195,11 +171,11 @@ V3._temp3 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span cla
         </li>
         
         
-        <li id="section-8">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <h2 id="function-v3-">Function: V3.$</h2>
 <p>Creates a new 3-element vector with the given values.</p>
@@ -220,11 +196,11 @@ V3._temp3 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span cla
         </li>
         
         
-        <li id="section-9">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <h2 id="function-v3-clone">Function: V3.clone</h2>
 <p>Clone the given 3-element vector.</p>
@@ -250,11 +226,11 @@ V3.v = V3.y;</pre></div></div>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <h2 id="function-v3-add">Function: V3.add</h2>
 <p>Perform r = a + b.</p>
@@ -274,7 +250,6 @@ V3.v = V3.y;</pre></div></div>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] + b[<span class="hljs-number">0</span>];
@@ -286,11 +261,11 @@ V3.v = V3.y;</pre></div></div>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <h2 id="function-v3-sub">Function: V3.sub</h2>
 <p>Perform
@@ -311,7 +286,6 @@ r = a - b.</p>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] - b[<span class="hljs-number">0</span>];
@@ -323,11 +297,11 @@ r = a - b.</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <h2 id="function-v3-neg">Function: V3.neg</h2>
 <p>Perform
@@ -346,7 +320,6 @@ r = - a.</p>
             <div class="content"><div class='highlight'><pre>V3.neg = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_neg</span><span class="hljs-params">(a, r)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     r[<span class="hljs-number">0</span>] = - a[<span class="hljs-number">0</span>];
@@ -358,11 +331,11 @@ r = - a.</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <h2 id="function-v3-direction">Function: V3.direction</h2>
 <p>Perform
@@ -384,7 +357,6 @@ direction from a to b.</p>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     <span class="hljs-keyword">return</span> V3.normalize(V3.sub(a, b, r), r);
@@ -393,11 +365,11 @@ direction from a to b.</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <h2 id="function-v3-length">Function: V3.length</h2>
 <p>Perform r = |a|.</p>
@@ -412,18 +384,17 @@ direction from a to b.</p>
             
             <div class="content"><div class='highlight'><pre>V3.length = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_length</span><span class="hljs-params">(a)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
-
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.sqrt(a[<span class="hljs-number">0</span>]*a[<span class="hljs-number">0</span>] + a[<span class="hljs-number">1</span>]*a[<span class="hljs-number">1</span>] + a[<span class="hljs-number">2</span>]*a[<span class="hljs-number">2</span>]);
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-15">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <h2 id="function-v3-lengthsquard">Function: V3.lengthSquard</h2>
 <p>Perform r = |a|*|a|.</p>
@@ -438,18 +409,17 @@ direction from a to b.</p>
             
             <div class="content"><div class='highlight'><pre>V3.lengthSquared = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_lengthSquared</span><span class="hljs-params">(a)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
-
     <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>]*a[<span class="hljs-number">0</span>] + a[<span class="hljs-number">1</span>]*a[<span class="hljs-number">1</span>] + a[<span class="hljs-number">2</span>]*a[<span class="hljs-number">2</span>];
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-16">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <h2 id="function-v3-normalize">Function: V3.normalize</h2>
 <p>Perform r = a / |a|.</p>
@@ -467,7 +437,6 @@ direction from a to b.</p>
             <div class="content"><div class='highlight'><pre>V3.normalize = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_normalize</span><span class="hljs-params">(a, r)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     <span class="hljs-keyword">var</span> im = <span class="hljs-number">1.0</span> / V3.length(a);
@@ -480,11 +449,11 @@ direction from a to b.</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <h2 id="function-v3-scale">Function: V3.scale</h2>
 <p>Perform r = a * k.</p>
@@ -503,7 +472,6 @@ direction from a to b.</p>
             <div class="content"><div class='highlight'><pre>V3.scale = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_scale</span><span class="hljs-params">(a, k, r)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">0</span>] * k;
@@ -515,11 +483,11 @@ direction from a to b.</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <h2 id="function-v3-dot">Function: V3.dot</h2>
 <p>Perform
@@ -537,7 +505,6 @@ r = dot(a, b).</p>
             <div class="content"><div class='highlight'><pre>V3.dot = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">V3_dot</span><span class="hljs-params">(a, b)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
-
     <span class="hljs-keyword">return</span> a[<span class="hljs-number">0</span>] * b[<span class="hljs-number">0</span>] +
         a[<span class="hljs-number">1</span>] * b[<span class="hljs-number">1</span>] +
         a[<span class="hljs-number">2</span>] * b[<span class="hljs-number">2</span>];
@@ -546,11 +513,11 @@ r = dot(a, b).</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <h2 id="function-v3-cross">Function: V3.cross</h2>
 <p>Perform r = a x b.</p>
@@ -570,7 +537,6 @@ r = dot(a, b).</p>
     MathUtils_assert(a.length == <span class="hljs-number">3</span>, <span class="hljs-string">"a.length == 3"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">3</span>, <span class="hljs-string">"b.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">3</span>);
     r[<span class="hljs-number">0</span>] = a[<span class="hljs-number">1</span>]*b[<span class="hljs-number">2</span>] - a[<span class="hljs-number">2</span>]*b[<span class="hljs-number">1</span>];
@@ -582,11 +548,11 @@ r = dot(a, b).</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <h2 id="function-v3-mul4x4">Function: V3.mul4x4</h2>
 <p>Perform
@@ -609,7 +575,6 @@ r = m * v.</p>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">3</span>, <span class="hljs-string">"r == undefined || r.length == 3"</span>);
-
     <span class="hljs-keyword">var</span> w;
     <span class="hljs-keyword">var</span> tmp = V3._temp1;
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
@@ -636,11 +601,11 @@ r = m * v.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <h1 id="class-m4x4">Class M4x4</h1>
 <p>Methods for working with 4x4 matrices.  A matrix is represented by a 16-element array
@@ -688,11 +653,11 @@ M4x4._temp2 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span c
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <h2 id="function-m4x4-">Function: M4x4.$</h2>
 <p>Creates a new 4x4 matrix with the given values.</p>
@@ -719,11 +684,11 @@ M4x4._temp2 = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span c
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <h2 id="function-m4x4-clone">Function: M4x4.clone</h2>
 <p>Clone the given 4x4 matrix.</p>
@@ -747,11 +712,11 @@ M4x4.identity = M4x4.I;</pre></div></div>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <h2 id="function-m4x4-topleft3x3">Function: M4x4.topLeft3x3</h2>
 <p>Return the top left 3x3 matrix from the given 4x4 matrix m.</p>
@@ -769,7 +734,6 @@ M4x4.identity = M4x4.I;</pre></div></div>
             <div class="content"><div class='highlight'><pre>M4x4.topLeft3x3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_topLeft3x3</span><span class="hljs-params">(m, r)</span> {</span>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">9</span>, <span class="hljs-string">"r == undefined || r.length == 9"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">9</span>);
     r[<span class="hljs-number">0</span>] = m[<span class="hljs-number">0</span>]; r[<span class="hljs-number">1</span>] = m[<span class="hljs-number">1</span>]; r[<span class="hljs-number">2</span>] = m[<span class="hljs-number">2</span>];
@@ -781,11 +745,11 @@ M4x4.identity = M4x4.I;</pre></div></div>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <h2 id="function-m4x4-inverseorthonormal">Function: M4x4.inverseOrthonormal</h2>
 <p>Computes the inverse of the given matrix m, assuming that
@@ -805,7 +769,6 @@ the matrix is orthonormal.</p>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
     MathUtils_assert(m != r, <span class="hljs-string">"m != r"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
     M4x4.transpose(m, r);
@@ -820,11 +783,11 @@ the matrix is orthonormal.</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <h2 id="function-m4x4-inverseto3x3">Function: M4x4.inverseTo3x3</h2>
 <p>Computes the inverse of the given matrix m, but calculates
@@ -843,7 +806,6 @@ only the top left 3x3 values of the result.</p>
             <div class="content"><div class='highlight'><pre>M4x4.inverseTo3x3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_inverseTo3x3</span><span class="hljs-params">(m, r)</span> {</span>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">9</span>, <span class="hljs-string">"r == undefined || r.length == 9"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">9</span>);
 
@@ -877,11 +839,11 @@ only the top left 3x3 values of the result.</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <h2 id="function-m4x4-makefrustum">Function: M4x4.makeFrustum</h2>
 <p>Creates a matrix for a projection frustum with the given parameters.</p>
@@ -903,7 +865,6 @@ only the top left 3x3 values of the result.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeFrustum = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeFrustum</span><span class="hljs-params">(left, right, bottom, top, znear, zfar, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
 
@@ -937,11 +898,11 @@ only the top left 3x3 values of the result.</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <h2 id="function-m4x4-makeperspective">Function: M4x4.makePerspective</h2>
 <p>Creates a matrix for a perspective projection with the given parameters.</p>
@@ -961,7 +922,6 @@ only the top left 3x3 values of the result.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makePerspective = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makePerspective</span> <span class="hljs-params">(fovy, aspect, znear, zfar, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">var</span> ymax = znear * <span class="hljs-built_in">Math</span>.tan(fovy * <span class="hljs-built_in">Math</span>.PI / <span class="hljs-number">360.0</span>);
     <span class="hljs-keyword">var</span> ymin = -ymax;
     <span class="hljs-keyword">var</span> xmin = ymin * aspect;
@@ -973,11 +933,11 @@ only the top left 3x3 values of the result.</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <h2 id="function-m4x4-makeortho">Function: M4x4.makeOrtho</h2>
 <p>Creates a matrix for an orthogonal frustum projection with the given parameters.</p>
@@ -999,7 +959,6 @@ only the top left 3x3 values of the result.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeOrtho = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeOrtho</span> <span class="hljs-params">(left, right, bottom, top, znear, zfar, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
 
@@ -1033,11 +992,11 @@ only the top left 3x3 values of the result.</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <h2 id="function-m4x4-makeortho">Function: M4x4.makeOrtho</h2>
 <p>Creates a matrix for a 2D orthogonal frustum projection with the given parameters.
@@ -1058,18 +1017,17 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeOrtho2D = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeOrtho2D</span> <span class="hljs-params">(left, right, bottom, top, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">return</span> M4x4.makeOrtho(left, right, bottom, top, -<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, r);
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <h2 id="function-m4x4-mul">Function: M4x4.mul</h2>
 <p>Performs r = a * b.</p>
@@ -1090,7 +1048,6 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
     MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
     MathUtils_assert(a != r &amp;&amp; b != r, <span class="hljs-string">"a != r &amp;&amp; b != r"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
 
@@ -1151,11 +1108,11 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <h2 id="function-m4x4-muloffset">Function: M4x4.mulOffset</h2>
 <p>Performs r’ = a * b, where r’ is the 16 elements of r starting at element o.</p>
@@ -1174,7 +1131,6 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
             <div class="content"><div class='highlight'><pre>M4x4.mulOffset = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_mulOffset</span><span class="hljs-params">(a, b, r, o)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">16</span>, <span class="hljs-string">"a.length == 16"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
-
     <span class="hljs-keyword">var</span> a21 = a[<span class="hljs-number">1</span>];
     <span class="hljs-keyword">var</span> a31 = a[<span class="hljs-number">2</span>];
     <span class="hljs-keyword">var</span> a41 = a[<span class="hljs-number">3</span>];
@@ -1231,11 +1187,11 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <h2 id="function-m4x4-mulaffine">Function: M4x4.mulAffine</h2>
 <p>Performs r = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1)</p>
@@ -1256,7 +1212,6 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
     MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
     MathUtils_assert(a != r &amp;&amp; b != r, <span class="hljs-string">"a != r &amp;&amp; b != r"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
     <span class="hljs-keyword">var</span> a11 = a[<span class="hljs-number">0</span>];
@@ -1308,11 +1263,11 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <h2 id="function-m4x4-mulaffineoffset">Function: M4x4.mulAffineOffset</h2>
 <p>Performs r’ = a * b, assuming a and b are affine (elements 3,7,11,15 = 0,0,0,1), where r’ is the 16 elements of r starting at element o</p>
@@ -1331,7 +1286,6 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
             <div class="content"><div class='highlight'><pre>M4x4.mulAffine = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_mulAffine</span><span class="hljs-params">(a, b, r, o)</span> {</span>
     MathUtils_assert(a.length == <span class="hljs-number">16</span>, <span class="hljs-string">"a.length == 16"</span>);
     MathUtils_assert(b.length == <span class="hljs-number">16</span>, <span class="hljs-string">"b.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
     <span class="hljs-keyword">var</span> a11 = a[<span class="hljs-number">0</span>];
@@ -1383,11 +1337,11 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <h2 id="function-m4x4-makerotate">Function: M4x4.makeRotate</h2>
 <p>Creates a transformation matrix for rotation by angle radians about the 3-element vector axis.</p>
@@ -1407,7 +1361,6 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
     MathUtils_assert(angle.length == <span class="hljs-number">3</span>, <span class="hljs-string">"angle.length == 3"</span>);
     MathUtils_assert(axis.length == <span class="hljs-number">3</span>, <span class="hljs-string">"axis.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
 
@@ -1440,11 +1393,11 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <h2 id="function-m4x4-rotate">Function: M4x4.rotate</h2>
 <p>Concatenates a rotation of angle radians about the axis to the give matrix m.</p>
@@ -1466,7 +1419,6 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
     MathUtils_assert(axis.length == <span class="hljs-number">3</span>, <span class="hljs-string">"axis.length == 3"</span>);
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
     <span class="hljs-keyword">var</span> a0=axis [<span class="hljs-number">0</span>], a1=axis [<span class="hljs-number">1</span>], a2=axis [<span class="hljs-number">2</span>];
@@ -1535,11 +1487,11 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <h2 id="function-m4x4-makescale3">Function: M4x4.makeScale3</h2>
 <p>Creates a transformation matrix for scaling by 3 scalar values, one for
@@ -1559,7 +1511,6 @@ each of the x, y, and z directions.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeScale3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeScale3</span><span class="hljs-params">(x, y, z, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
 
@@ -1586,11 +1537,11 @@ each of the x, y, and z directions.</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <h2 id="function-m4x4-makescale1">Function: M4x4.makeScale1</h2>
 <p>Creates a transformation matrix for a uniform scale by a single scalar value.</p>
@@ -1607,18 +1558,17 @@ each of the x, y, and z directions.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeScale1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeScale1</span><span class="hljs-params">(k, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">return</span> M4x4.makeScale3(k, k, k, r);
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-39">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <h2 id="function-m4x4-makescale">Function: M4x4.makeScale</h2>
 <p>Creates a transformation matrix for scaling each of the x, y, and z axes by the amount
@@ -1637,18 +1587,17 @@ given in the corresponding element of the 3-element vector.</p>
             <div class="content"><div class='highlight'><pre>M4x4.makeScale = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeScale</span><span class="hljs-params">(v, r)</span> {</span>
     MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">return</span> M4x4.makeScale3(v[<span class="hljs-number">0</span>], v[<span class="hljs-number">1</span>], v[<span class="hljs-number">2</span>], r);
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-40">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <h2 id="function-m4x4-scale3">Function: M4x4.scale3</h2>
 
@@ -1657,7 +1606,6 @@ given in the corresponding element of the 3-element vector.</p>
             <div class="content"><div class='highlight'><pre>M4x4.scale3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_scale3</span><span class="hljs-params">(x, y, z, m, r)</span> {</span>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == m) {
         m[<span class="hljs-number">0</span>] *= x;
         m[<span class="hljs-number">1</span>] *= x;
@@ -1700,11 +1648,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-41">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <h2 id="function-m4x4-scale1">Function: M4x4.scale1</h2>
 
@@ -1756,11 +1704,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-42">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <h2 id="function-m4x4-scale1">Function: M4x4.scale1</h2>
 
@@ -1815,11 +1763,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-43">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <h2 id="function-m4x4-maketranslate3">Function: M4x4.makeTranslate3</h2>
 
@@ -1827,7 +1775,6 @@ given in the corresponding element of the 3-element vector.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeTranslate3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate3</span><span class="hljs-params">(x, y, z, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
         r = <span class="hljs-keyword">new</span> MJS_FLOAT_ARRAY_TYPE(<span class="hljs-number">16</span>);
 
@@ -1854,11 +1801,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-44">
+        <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
               <h2 id="function-m4x4-maketranslate1">Function: M4x4.makeTranslate1</h2>
 
@@ -1866,8 +1813,26 @@ given in the corresponding element of the 3-element vector.</p>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeTranslate1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate1</span> <span class="hljs-params">(k, r)</span> {</span>
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">return</span> M4x4.makeTranslate3(k, k, k, r);
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <h2 id="function-m4x4-maketranslate">Function: M4x4.makeTranslate</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>M4x4.makeTranslate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate</span> <span class="hljs-params">(v, r)</span> {</span>
+    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
+    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
+    <span class="hljs-keyword">return</span> M4x4.makeTranslate3(v[<span class="hljs-number">0</span>], v[<span class="hljs-number">1</span>], v[<span class="hljs-number">2</span>], r);
 };</pre></div></div>
             
         </li>
@@ -1878,26 +1843,6 @@ given in the corresponding element of the 3-element vector.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-45">&#182;</a>
-              </div>
-              <h2 id="function-m4x4-maketranslate">Function: M4x4.makeTranslate</h2>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>M4x4.makeTranslate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeTranslate</span> <span class="hljs-params">(v, r)</span> {</span>
-    MathUtils_assert(v.length == <span class="hljs-number">3</span>, <span class="hljs-string">"v.length == 3"</span>);
-    MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
-    <span class="hljs-keyword">return</span> M4x4.makeTranslate3(v[<span class="hljs-number">0</span>], v[<span class="hljs-number">1</span>], v[<span class="hljs-number">2</span>], r);
-};</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-46">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <h2 id="function-m4x4-translate3self">Function: M4x4.translate3Self</h2>
 
@@ -1916,11 +1861,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <h2 id="function-m4x4-translate3">Function: M4x4.translate3</h2>
 
@@ -1929,7 +1874,6 @@ given in the corresponding element of the 3-element vector.</p>
             <div class="content"><div class='highlight'><pre>M4x4.translate3 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translate3</span> <span class="hljs-params">(x, y, z, m, r)</span> {</span>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (r == m) {
         m[<span class="hljs-number">12</span>] += m[<span class="hljs-number">0</span>] * x + m[<span class="hljs-number">4</span>] * y + m[<span class="hljs-number">8</span>] * z;
         m[<span class="hljs-number">13</span>] += m[<span class="hljs-number">1</span>] * x + m[<span class="hljs-number">5</span>] * y + m[<span class="hljs-number">9</span>] * z;
@@ -1978,11 +1922,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <h2 id="function-m4x4-translate1">Function: M4x4.translate1</h2>
 
@@ -1991,18 +1935,17 @@ given in the corresponding element of the 3-element vector.</p>
             <div class="content"><div class='highlight'><pre>M4x4.translate1 = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_translate1</span> <span class="hljs-params">(k, m, r)</span> {</span>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">return</span> M4x4.translate3(k, k, k, m, r);
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-49">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <h2 id="function-m4x4-translateself">Function: M4x4.translateSelf</h2>
 
@@ -2022,11 +1965,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <h2 id="function-m4x4-translate">Function: M4x4.translate</h2>
 
@@ -2084,11 +2027,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <h2 id="function-m4x4-makelookat">Function: M4x4.makeLookAt</h2>
 
@@ -2099,7 +2042,6 @@ given in the corresponding element of the 3-element vector.</p>
     MathUtils_assert(center.length == <span class="hljs-number">3</span>, <span class="hljs-string">"center.length == 3"</span>);
     MathUtils_assert(up.length == <span class="hljs-number">3</span>, <span class="hljs-string">"up.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">var</span> z = V3.direction(eye, center, V3._temp1);
     <span class="hljs-keyword">var</span> x = V3.normalize(V3.cross(up, z, V3._temp2), V3._temp2);
     <span class="hljs-keyword">var</span> y = V3.normalize(V3.cross(z, x, V3._temp3), V3._temp3);
@@ -2137,11 +2079,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <h2 id="function-m4x4-transposeself">Function: M4x4.transposeSelf</h2>
 
@@ -2161,11 +2103,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <h2 id="function-m4x4-transpose">Function: M4x4.transpose</h2>
 
@@ -2174,7 +2116,6 @@ given in the corresponding element of the 3-element vector.</p>
             <div class="content"><div class='highlight'><pre>M4x4.transpose = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_transpose</span> <span class="hljs-params">(m, r)</span> {</span>
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
-
     <span class="hljs-keyword">if</span> (m == r) {
         <span class="hljs-keyword">var</span> tmp = <span class="hljs-number">0.0</span>;
         tmp = m[<span class="hljs-number">1</span>]; m[<span class="hljs-number">1</span>] = m[<span class="hljs-number">4</span>]; m[<span class="hljs-number">4</span>] = tmp;
@@ -2200,11 +2141,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <h2 id="function-m4x4-transformpoint">Function: M4x4.transformPoint</h2>
 
@@ -2236,11 +2177,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <h2 id="function-m4x4-transformline">Function: M4x4.transformLine</h2>
 
@@ -2271,11 +2212,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <h2 id="function-m4x4-transformpointaffine">Function: M4x4.transformPointAffine</h2>
 
@@ -2300,11 +2241,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <h2 id="function-m4x4-transformlineaffine">Function: M4x4.transformLineAffine</h2>
 
@@ -2328,11 +2269,11 @@ given in the corresponding element of the 3-element vector.</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>export public API:</p>
 

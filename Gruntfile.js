@@ -4,6 +4,43 @@ module.exports = function(grunt) {
   var LIVERELOAD_PORT = 8675;
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+
+    preprocess: {
+      options: {
+        context: {
+          MJS_VERSION: '<%= pkg.version %>',
+          MJS_DO_ASSERT: true
+        }
+      },
+      dev: {
+        src: 'src/mjs.js',
+        dest: 'mjs.js'
+      },
+      prod: {
+        src: 'src/mjs.js',
+        dest: 'mjs.js',
+        options: {
+          context: {
+            MJS_DO_ASSERT: false
+          }
+        }
+      }
+    },
+
+   uglify: {
+      options: {
+        banner: '/* <%= pkg.name %> v<%= pkg.version %>\n * <%= pkg.author %>\n * built on <%= grunt.template.today("yyyy-mm-dd") %> \n */\n'
+      },
+      prod: {
+        mangle: {
+          except: ['mjs', 'V3', 'M4x4']
+        },
+        src: 'mjs.js',
+        dest: 'mjs.min.js'
+      }
+    },
+
     docco: {
       debug: {
         src: ['mjs.js'],
@@ -32,8 +69,8 @@ module.exports = function(grunt) {
       },
 
       src: {
-        files: ['mjs.js'],
-        tasks: ['docs']
+        files: ['src/**/*.js'],
+        tasks: ['build', 'docs']
       }
     }
   });
@@ -41,7 +78,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-preprocess');
 
+  grunt.registerTask('build', ['preprocess:prod', 'uglify', 'preprocess:dev']);
   grunt.registerTask('docs', ['docco']);
-  grunt.registerTask('default', ['docs', 'connect', 'watch']);
+  grunt.registerTask('default', ['build', 'docs', 'connect', 'watch']);
 };

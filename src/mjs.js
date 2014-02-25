@@ -39,7 +39,7 @@ define([], function() {
 //
 // mjs version number aa.bb.cc, encoded as a string
 //
-const MJS_VERSION = '0.0.2';
+const MJS_VERSION = '/* @echo MJS_VERSION */';
 
 //
 // ##Constant: MJS_FLOAT_ARRAY_TYPE
@@ -53,10 +53,13 @@ const MJS_VERSION = '0.0.2';
 //
 const MJS_FLOAT_ARRAY_TYPE = Float64Array;
 
+// @if MJS_DO_ASSERT
 function MathUtils_assert(cond, msg) {
     if (!cond)
         throw "Assertion failed: " + msg;
 }
+// @endif
+
 //
 // #Class V3
 //
@@ -81,7 +84,10 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
     };
 
     V3.clone = function V3_clone(a) {
+        // @if MJS_DO_ASSERT
         MathUtils_assert(a.length == 3, "a.length == 3");
+        // @endif
+
         return [a[0], a[1], a[2]];
     };
 } else {
@@ -122,7 +128,10 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
 //
 
     V3.clone = function V3_clone(a) {
+        // @if MJS_DO_ASSERT
         MathUtils_assert(a.length == 3, "a.length == 3");
+        // @endif
+
         return new MJS_FLOAT_ARRAY_TYPE(a);
     };
 }
@@ -147,9 +156,12 @@ V3.v = V3.y;
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.add = function V3_add(a, b, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     r[0] = a[0] + b[0];
@@ -176,9 +188,12 @@ V3.add = function V3_add(a, b, r) {
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.sub = function V3_sub(a, b, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     r[0] = a[0] - b[0];
@@ -204,8 +219,12 @@ V3.sub = function V3_sub(a, b, r) {
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.neg = function V3_neg(a, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     r[0] = - a[0];
@@ -233,9 +252,13 @@ V3.neg = function V3_neg(a, r) {
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.direction = function V3_direction(a, b, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     return V3.normalize(V3.sub(a, b, r), r);
@@ -255,7 +278,10 @@ V3.direction = function V3_direction(a, b, r) {
 //   The length of the given vector.
 //
 V3.length = function V3_length(a) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
+    // @endif
+
     return Math.sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
 };
 
@@ -273,7 +299,10 @@ V3.length = function V3_length(a) {
 //   The square of the length of the given vector.
 //
 V3.lengthSquared = function V3_lengthSquared(a) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
+    // @endif
+
     return a[0]*a[0] + a[1]*a[1] + a[2]*a[2];
 };
 
@@ -293,8 +322,11 @@ V3.lengthSquared = function V3_lengthSquared(a) {
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.normalize = function V3_normalize(a, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     var im = 1.0 / V3.length(a);
@@ -321,8 +353,11 @@ V3.normalize = function V3_normalize(a, r) {
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.scale = function V3_scale(a, k, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     r[0] = a[0] * k;
@@ -347,8 +382,11 @@ V3.scale = function V3_scale(a, k, r) {
 //   The dot product of a and b.
 //
 V3.dot = function V3_dot(a, b) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
+    // @endif
+
     return a[0] * b[0] +
         a[1] * b[1] +
         a[2] * b[2];
@@ -371,9 +409,12 @@ V3.dot = function V3_dot(a, b) {
 //   Otherwise, returns a new 3-element vector with the result.
 //
 V3.cross = function V3_cross(a, b, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 3, "a.length == 3");
     MathUtils_assert(b.length == 3, "b.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
     r[0] = a[1]*b[2] - a[2]*b[1];
@@ -402,9 +443,12 @@ V3.cross = function V3_cross(a, b, r) {
 //   and returned as a 3-element vector.
 //
 V3.mul4x4 = function V3_mul4x4(m, v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     var w;
     var tmp = V3._temp1;
     if (r == undefined)
@@ -459,7 +503,10 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
     };
 
     M4x4.clone = function M4x4_clone(m) {
+        // @if MJS_DO_ASSERT
         MathUtils_assert(m.length == 16, "m.length == 16");
+        // @endif
+
         return new [m[0], m[1], m[2], m[3],
                     m[4], m[5], m[6], m[7],
                     m[8], m[9], m[10], m[11],
@@ -509,7 +556,10 @@ if (MJS_FLOAT_ARRAY_TYPE == Array) {
 // A new matrix with the same values as the passed-in one.
 //
     M4x4.clone = function M4x4_clone(m) {
+        // @if MJS_DO_ASSERT
         MathUtils_assert(m.length == 16, "m.length == 16");
+        // @endif
+
         return new MJS_FLOAT_ARRAY_TYPE(m);
     };
 }
@@ -532,8 +582,11 @@ M4x4.identity = M4x4.I;
 //   Otherwise, returns a new 3x3 matrix with the result.
 //
 M4x4.topLeft3x3 = function M4x4_topLeft3x3(m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 9, "r == undefined || r.length == 9");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(9);
     r[0] = m[0]; r[1] = m[1]; r[2] = m[2];
@@ -559,9 +612,12 @@ M4x4.topLeft3x3 = function M4x4_topLeft3x3(m, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.inverseOrthonormal = function M4x4_inverseOrthonormal(m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
     MathUtils_assert(m != r, "m != r");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
     M4x4.transpose(m, r);
@@ -590,8 +646,11 @@ M4x4.inverseOrthonormal = function M4x4_inverseOrthonormal(m, r) {
 //   Otherwise, returns a new 3x3 matrix with the result.
 //
 M4x4.inverseTo3x3 = function M4x4_inverseTo3x3(m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 9, "r == undefined || r.length == 9");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(9);
 
@@ -643,7 +702,10 @@ M4x4.inverseTo3x3 = function M4x4_inverseTo3x3(m, r) {
 //   Otherwise, returns a new 4x4 matrix.
 //
 M4x4.makeFrustum = function M4x4_makeFrustum(left, right, bottom, top, znear, zfar, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
 
@@ -693,7 +755,10 @@ M4x4.makeFrustum = function M4x4_makeFrustum(left, right, bottom, top, znear, zf
 //   Otherwise, returns a new 4x4 matrix.
 //
 M4x4.makePerspective = function M4x4_makePerspective (fovy, aspect, znear, zfar, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     var ymax = znear * Math.tan(fovy * Math.PI / 360.0);
     var ymin = -ymax;
     var xmin = ymin * aspect;
@@ -723,7 +788,10 @@ M4x4.makePerspective = function M4x4_makePerspective (fovy, aspect, znear, zfar,
 //   Otherwise, returns a new 4x4 matrix.
 //
 M4x4.makeOrtho = function M4x4_makeOrtho (left, right, bottom, top, znear, zfar, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
 
@@ -774,7 +842,10 @@ M4x4.makeOrtho = function M4x4_makeOrtho (left, right, bottom, top, znear, zfar,
 //   Otherwise, returns a new 4x4 matrix.
 //
 M4x4.makeOrtho2D = function M4x4_makeOrtho2D (left, right, bottom, top, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     return M4x4.makeOrtho(left, right, bottom, top, -1, 1, r);
 };
 
@@ -795,10 +866,13 @@ M4x4.makeOrtho2D = function M4x4_makeOrtho2D (left, right, bottom, top, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.mul = function M4x4_mul(a, b, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
     MathUtils_assert(a != r && b != r, "a != r && b != r");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
 
@@ -873,8 +947,11 @@ M4x4.mul = function M4x4_mul(a, b, r) {
 //   r
 //
 M4x4.mulOffset = function M4x4_mulOffset(a, b, r, o) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
+    // @endif
+
     var a21 = a[1];
     var a31 = a[2];
     var a41 = a[3];
@@ -945,10 +1022,13 @@ M4x4.mulOffset = function M4x4_mulOffset(a, b, r, o) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.mulAffine = function M4x4_mulAffine(a, b, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
     MathUtils_assert(a != r && b != r, "a != r && b != r");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
     var a11 = a[0];
@@ -1014,8 +1094,11 @@ M4x4.mulAffine = function M4x4_mulAffine(a, b, r) {
 //   r
 //
 M4x4.mulAffine = function M4x4_mulAffine(a, b, r, o) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(a.length == 16, "a.length == 16");
     MathUtils_assert(b.length == 16, "b.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
     var a11 = a[0];
@@ -1081,9 +1164,12 @@ M4x4.mulAffine = function M4x4_mulAffine(a, b, r, o) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(angle.length == 3, "angle.length == 3");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
 
@@ -1131,10 +1217,13 @@ M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.rotate = function M4x4_rotate(angle, axis, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(angle.length == 3, "angle.length == 3");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
     var a0=axis [0], a1=axis [1], a2=axis [2];
@@ -1219,7 +1308,10 @@ M4x4.rotate = function M4x4_rotate(angle, axis, m, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.makeScale3 = function M4x4_makeScale3(x, y, z, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
 
@@ -1259,7 +1351,10 @@ M4x4.makeScale3 = function M4x4_makeScale3(x, y, z, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.makeScale1 = function M4x4_makeScale1(k, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     return M4x4.makeScale3(k, k, k, r);
 };
 
@@ -1280,8 +1375,11 @@ M4x4.makeScale1 = function M4x4_makeScale1(k, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.makeScale = function M4x4_makeScale(v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     return M4x4.makeScale3(v[0], v[1], v[2], r);
 };
 
@@ -1289,8 +1387,11 @@ M4x4.makeScale = function M4x4_makeScale(v, r) {
 // ##Function: M4x4.scale3
 //
 M4x4.scale3 = function M4x4_scale3(x, y, z, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == m) {
         m[0] *= x;
         m[1] *= x;
@@ -1334,8 +1435,11 @@ M4x4.scale3 = function M4x4_scale3(x, y, z, m, r) {
 // ##Function: M4x4.scale1
 //
 M4x4.scale1 = function M4x4_scale1(k, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == m) {
         m[0] *= k;
         m[1] *= k;
@@ -1380,9 +1484,12 @@ M4x4.scale1 = function M4x4_scale1(k, m, r) {
 // ##Function: M4x4.scale1
 //
 M4x4.scale = function M4x4_scale(v, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     var x = v[0], y = v[1], z = v[2];
 
     if (r == m) {
@@ -1429,7 +1536,10 @@ M4x4.scale = function M4x4_scale(v, m, r) {
 // ##Function: M4x4.makeTranslate3
 //
 M4x4.makeTranslate3 = function M4x4_makeTranslate3(x, y, z, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(16);
 
@@ -1457,7 +1567,10 @@ M4x4.makeTranslate3 = function M4x4_makeTranslate3(x, y, z, r) {
 // ##Function: M4x4.makeTranslate1
 //
 M4x4.makeTranslate1 = function M4x4_makeTranslate1 (k, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     return M4x4.makeTranslate3(k, k, k, r);
 };
 
@@ -1465,8 +1578,11 @@ M4x4.makeTranslate1 = function M4x4_makeTranslate1 (k, r) {
 // ##Function: M4x4.makeTranslate
 //
 M4x4.makeTranslate = function M4x4_makeTranslate (v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     return M4x4.makeTranslate3(v[0], v[1], v[2], r);
 };
 
@@ -1474,8 +1590,11 @@ M4x4.makeTranslate = function M4x4_makeTranslate (v, r) {
 // ##Function: M4x4.translate3Self
 //
 M4x4.translate3Self = function M4x4_translate3Self (x, y, z, m) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     m[12] += m[0] * x + m[4] * y + m[8] * z;
     m[13] += m[1] * x + m[5] * y + m[9] * z;
     m[14] += m[2] * x + m[6] * y + m[10] * z;
@@ -1487,8 +1606,11 @@ M4x4.translate3Self = function M4x4_translate3Self (x, y, z, m) {
 // ##Function: M4x4.translate3
 //
 M4x4.translate3 = function M4x4_translate3 (x, y, z, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (r == m) {
         m[12] += m[0] * x + m[4] * y + m[8] * z;
         m[13] += m[1] * x + m[5] * y + m[9] * z;
@@ -1538,16 +1660,22 @@ M4x4.translate3 = function M4x4_translate3 (x, y, z, m, r) {
 // ##Function: M4x4.translate1
 //
 M4x4.translate1 = function M4x4_translate1 (k, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     return M4x4.translate3(k, k, k, m, r);
 };
 //
 // ##Function: M4x4.translateSelf
 //
 M4x4.translateSelf = function M4x4_translateSelf (v, m) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
+    // @endif
+
     var x=v[0], y=v[1], z=v[2];
     m[12] += m[0] * x + m[4] * y + m[8] * z;
     m[13] += m[1] * x + m[5] * y + m[9] * z;
@@ -1559,9 +1687,12 @@ M4x4.translateSelf = function M4x4_translateSelf (v, m) {
 // ##Function: M4x4.translate
 //
 M4x4.translate = function M4x4_translate (v, m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     var x=v[0], y=v[1], z=v[2];
     if (r == m) {
         m[12] += m[0] * x + m[4] * y + m[8] * z;
@@ -1611,10 +1742,13 @@ M4x4.translate = function M4x4_translate (v, m, r) {
 // ##Function: M4x4.makeLookAt
 //
 M4x4.makeLookAt = function M4x4_makeLookAt (eye, center, up, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(eye.length == 3, "eye.length == 3");
     MathUtils_assert(center.length == 3, "center.length == 3");
     MathUtils_assert(up.length == 3, "up.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     var z = V3.direction(eye, center, V3._temp1);
     var x = V3.normalize(V3.cross(up, z, V3._temp2), V3._temp2);
     var y = V3.normalize(V3.cross(z, x, V3._temp3), V3._temp3);
@@ -1653,7 +1787,10 @@ M4x4.makeLookAt = function M4x4_makeLookAt (eye, center, up, r) {
 // ##Function: M4x4.transposeSelf
 //
 M4x4.transposeSelf = function M4x4_transposeSelf (m) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
+    // @endif
+
     var tmp = m[1]; m[1] = m[4]; m[4] = tmp;
     tmp = m[2]; m[2] = m[8]; m[8] = tmp;
     tmp = m[3]; m[3] = m[12]; m[12] = tmp;
@@ -1666,8 +1803,11 @@ M4x4.transposeSelf = function M4x4_transposeSelf (m) {
 // ##Function: M4x4.transpose
 //
 M4x4.transpose = function M4x4_transpose (m, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
+    // @endif
+
     if (m == r) {
         var tmp = 0.0;
         tmp = m[1]; m[1] = m[4]; m[4] = tmp;
@@ -1695,9 +1835,12 @@ M4x4.transpose = function M4x4_transpose (m, r) {
 // ##Function: M4x4.transformPoint
 //
 M4x4.transformPoint = function M4x4_transformPoint (m, v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
 
@@ -1721,9 +1864,12 @@ M4x4.transformPoint = function M4x4_transformPoint (m, v, r) {
 // ##Function: M4x4.transformLine
 //
 M4x4.transformLine = function M4x4_transformLine(m, v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
 
@@ -1747,9 +1893,12 @@ M4x4.transformLine = function M4x4_transformLine(m, v, r) {
 // ##Function: M4x4.transformPointAffine
 //
 M4x4.transformPointAffine = function M4x4_transformPointAffine (m, v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
 
@@ -1766,9 +1915,12 @@ M4x4.transformPointAffine = function M4x4_transformPointAffine (m, v, r) {
 // ##Function: M4x4.transformLineAffine
 //
 M4x4.transformLineAffine = function M4x4_transformLineAffine(m, v, r) {
+    // @if MJS_DO_ASSERT
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(v.length == 3, "v.length == 3");
     MathUtils_assert(r == undefined || r.length == 3, "r == undefined || r.length == 3");
+    // @endif
+
     if (r == undefined)
         r = new MJS_FLOAT_ARRAY_TYPE(3);
 
