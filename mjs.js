@@ -39,7 +39,7 @@ define([], function() {
 //
 // ##Constant: MJS_VERSION
 //
-// mjs version number aa.bb.cc, encoded as a string
+// mjs version number encoded as a string
 //
 const MJS_VERSION = '0.0.5';
 
