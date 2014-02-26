@@ -28,6 +28,8 @@
 //
 // #mjs
 //
+// undefined
+//
 // Vector and Matrix math utilities for JavaScript, optimized for WebGL.
 //
 
@@ -39,7 +41,7 @@ define([], function() {
 //
 // mjs version number aa.bb.cc, encoded as a string
 //
-const MJS_VERSION = '0.0.4';
+const MJS_VERSION = '0.0.5';
 
 //
 // ##Constant: MJS_FLOAT_ARRAY_TYPE

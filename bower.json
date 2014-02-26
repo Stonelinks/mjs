@@ -1,7 +1,7 @@
 {
   "name": "mjs",
   "main": "mjs.js",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "https://github.com/Stonelinks/mjs",
   "authors": [
     "Lucas Doyle <lucas.p.doyle@gmail.com>"

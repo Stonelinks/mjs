@@ -1,6 +1,6 @@
 {
   "name": "mjs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A JavaScript vector and matrix math library, optimized for WebGL usage",
   "main": "mjs.js",
   "scripts": {
