@@ -10,6 +10,7 @@ module.exports = function(grunt) {
       options: {
         context: {
           MJS_VERSION: '<%= pkg.version %>',
+          MJS_HOMEPAGE: '<%= pkg.homepage %>',
           MJS_DO_ASSERT: true
         }
       },
