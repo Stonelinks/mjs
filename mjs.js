@@ -41,7 +41,7 @@ define([], function() {
 //
 // mjs version number encoded as a string
 //
-const MJS_VERSION = '0.0.5';
+const MJS_VERSION = '0.0.6';
 
 //
 // ##Constant: MJS_FLOAT_ARRAY_TYPE
