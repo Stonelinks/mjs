@@ -39,7 +39,7 @@ define([], function() {
 //
 // mjs version number aa.bb.cc, encoded as a string
 //
-const MJS_VERSION = '0.0.2';
+const MJS_VERSION = '0.0.4';
 
 //
 // ##Constant: MJS_FLOAT_ARRAY_TYPE
