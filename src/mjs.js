@@ -1167,7 +1167,7 @@ M4x4.mulAffine = function M4x4_mulAffine(a, b, r, o) {
 //
 M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
     // @if MJS_DO_ASSERT
-    MathUtils_assert(angle.length == 3, "angle.length == 3");
+    MathUtils_assert(angle.length == undefined, "angle should not have a length");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
     // @endif
@@ -1220,7 +1220,7 @@ M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
 //
 M4x4.rotate = function M4x4_rotate(angle, axis, m, r) {
     // @if MJS_DO_ASSERT
-    MathUtils_assert(angle.length == 3, "angle.length == 3");
+    MathUtils_assert(angle.length == undefined, "angle should not have a length");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");

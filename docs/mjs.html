@@ -1359,7 +1359,7 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>M4x4.makeRotate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_makeRotate</span><span class="hljs-params">(angle, axis, r)</span> {</span>
-    MathUtils_assert(angle.length == <span class="hljs-number">3</span>, <span class="hljs-string">"angle.length == 3"</span>);
+    MathUtils_assert(angle.length == <span class="hljs-literal">undefined</span>, <span class="hljs-string">"angle should not have a length"</span>);
     MathUtils_assert(axis.length == <span class="hljs-number">3</span>, <span class="hljs-string">"axis.length == 3"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);
     <span class="hljs-keyword">if</span> (r == <span class="hljs-literal">undefined</span>)
@@ -1416,7 +1416,7 @@ znear and zfar are assumed to be -1 and 1, respectively.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>M4x4.rotate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">M4x4_rotate</span><span class="hljs-params">(angle, axis, m, r)</span> {</span>
-    MathUtils_assert(angle.length == <span class="hljs-number">3</span>, <span class="hljs-string">"angle.length == 3"</span>);
+    MathUtils_assert(angle.length == <span class="hljs-literal">undefined</span>, <span class="hljs-string">"angle should not have a length"</span>);
     MathUtils_assert(axis.length == <span class="hljs-number">3</span>, <span class="hljs-string">"axis.length == 3"</span>);
     MathUtils_assert(m.length == <span class="hljs-number">16</span>, <span class="hljs-string">"m.length == 16"</span>);
     MathUtils_assert(r == <span class="hljs-literal">undefined</span> || r.length == <span class="hljs-number">16</span>, <span class="hljs-string">"r == undefined || r.length == 16"</span>);

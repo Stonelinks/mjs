@@ -1083,7 +1083,7 @@ M4x4.mulAffine = function M4x4_mulAffine(a, b, r, o) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
-    MathUtils_assert(angle.length == 3, "angle.length == 3");
+    MathUtils_assert(angle.length == undefined, "angle should not have a length");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
     if (r == undefined)
@@ -1133,7 +1133,7 @@ M4x4.makeRotate = function M4x4_makeRotate(angle, axis, r) {
 //   Otherwise, returns a new 4x4 matrix with the result.
 //
 M4x4.rotate = function M4x4_rotate(angle, axis, m, r) {
-    MathUtils_assert(angle.length == 3, "angle.length == 3");
+    MathUtils_assert(angle.length == undefined, "angle should not have a length");
     MathUtils_assert(axis.length == 3, "axis.length == 3");
     MathUtils_assert(m.length == 16, "m.length == 16");
     MathUtils_assert(r == undefined || r.length == 16, "r == undefined || r.length == 16");
