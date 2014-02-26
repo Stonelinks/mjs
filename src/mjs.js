@@ -28,6 +28,8 @@
 //
 // #mjs
 //
+// /* @echo MJS_HOMEPAGE */
+//
 // Vector and Matrix math utilities for JavaScript, optimized for WebGL.
 //
 
